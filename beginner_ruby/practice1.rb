@@ -1,1 +1,1 @@
-puts "my very first practice"
+puts "hello"
