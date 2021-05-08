@@ -1,3 +1,5 @@
+#!/Users/masataka_ikeda/.rbenv/versions/3.0.1/bin/ruby
+
 (1..20).each do |x|
   if x % 5 == 0 && x % 3 == 0
     puts "FizzBuzz"
