@@ -5,6 +5,14 @@ require 'optparse'
 #   @parameter = ARGV.getopts('lar')
 # end
 
+
+# class BasicAry
+#   def initialize(option)
+#     @parameter = option.getopts('lar')
+#   end
+# end
+
+
 @parameter = ARGV.getopts('lar')
 
 
@@ -32,19 +40,31 @@ def array_for_symlink
   end
 end
 
-num_array = array_for_symlink.size
-thr_dim1 = array_decide.map{|file| file.size}
-thr_dim2 = thr_dim1.max
-size_dim1 = thr_dim1.size
-amari_keisan = size_dim1.divmod(3)
-amari_tasu = Array.new(size_dim1.divmod(3)[1], 0)
+
+@tate = 3
+
+# p num_array = array_for_symlink.size
+
+# p thr_dim1 = array_decide.map{|file| file.size}
 
 
-thr_slice = 
-if size_dim1.divmod(3)[1] == 0
-  size_dim1.divmod(3)[0]
+# p thr_dim2 = thr_dim1.max
+
+# p size_dim1 = thr_dim1.size
+p size_dim1 = array_decide.map{|file| file.size}.size
+p array_decide.size
+p amari_keisan = size_dim1.divmod(@tate)
+
+
+# p amari_tasu = Array.new(size_dim1.divmod(3)[1], 0)
+
+
+
+p thr_slice = 
+if size_dim1.divmod(@tate)[1] == 0
+  size_dim1.divmod(@tate)[0]
 else
-  size_dim1.divmod(3)[0] + 1
+  size_dim1.divmod(@tate)[0] + 1
 end
 
 # p thr_slice
