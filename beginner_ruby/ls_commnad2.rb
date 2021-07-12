@@ -13,7 +13,7 @@ require 'optparse'
 # end
 
 
-@parameter = ARGV.getopts('lar')
+@parameter = ARGV.getopts('lar') 
 
 
 # p params
