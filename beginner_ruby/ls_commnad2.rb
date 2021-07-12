@@ -41,6 +41,10 @@ def array_for_symlink
 end
 
 
+# 最終確定した配列が必要
+## その配列の長さが必要
+
+
 @tate = 3
 
 # p num_array = array_for_symlink.size
