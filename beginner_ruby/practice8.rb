@@ -1,12 +1,12 @@
 # 8-1
 # 問1
-a = {:cofee => 300, :caffe_latte => 400}.class
+a = { cofee: 300, caffe_latte: 400 }.class
 puts a
 ## "puts ({:cofee => 300, :caffe_latte => 400}).class !!!!! こうする必要がある"
 
 # 8-1
 # 2
-hash = Hash.new
+hash = {}
 puts hash
 
 # 8-2
@@ -20,7 +20,7 @@ puts la.class
 # 4
 class Item
   def name
-    "チーズケーキ"
+    'チーズケーキ'
   end
 end
 
@@ -30,23 +30,18 @@ puts cake.name
 # 8-4
 # 5
 class Item
-  def name=(text)
-    @name = text
-  end
-  def name
-    @name
-  end
+  attr_accessor :name
 end
 
 item = Item.new
-item.name = "チーズケーキ"
+item.name = 'チーズケーキ'
 puts item.name
 
 # 8-5
 # 6
 class Item
   def initialize
-    puts "商品を扱うオブジェクト"
+    puts '商品を扱うオブジェクト'
   end
 end
 
@@ -58,13 +53,12 @@ class Item
   def initialize(text)
     @name = text
   end
-  def name
-    @name 
-  end
+
+  attr_reader :name
 end
 
-item1 = Item.new("マフィン")
-item2 = Item.new("スコーン")
+item1 = Item.new('マフィン')
+item2 = Item.new('スコーン')
 
 puts item1.name
 puts item2.name
@@ -73,7 +67,7 @@ puts item2.name
 # 8
 class Drink
   def self.todays_special
-    "ホワイトモカ"
+    'ホワイトモカ'
   end
 end
 
@@ -83,17 +77,12 @@ puts Drink.todays_special
 # 8-7
 # 9
 class Item
-  def name
-    @name
-  end
-  def name=(text)
-    @name = text
-  end
+  attr_accessor :name
 end
 
 class Food < Item
 end
 
 food1 = Food.new
-food1.name = "チーズケーキ"
+food1.name = 'チーズケーキ'
 puts food1.name

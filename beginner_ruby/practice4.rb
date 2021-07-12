@@ -1,24 +1,24 @@
-#4-1
-arr = ["coffee", "latte"]
+# 4-1
+arr = %w[coffee latte]
 p arr
 
-#4-2
-drinks = ["coffee", "latte", "mocca"]
+# 4-2
+drinks = %w[coffee latte mocca]
 puts drinks[1]
 puts drinks.first
 puts drinks.last
 
-#4-3
-p ["coffee", "latte"].push("mocca")
+# 4-3
+p %w[coffee latte].push('mocca')
 p [2, 3].unshift(1)
 p [1, 2] + [3, 4]
 
-#4-4
-["tea latte", "cafe latte", "macha latte"].each do |x|
+# 4-4
+['tea latte', 'cafe latte', 'macha latte'].each do |x|
   puts x
 end
 
-["tea latte", "cafe latte", "macha latte"].each do |x|
+['tea latte', 'cafe latte', 'macha latte'].each do |x|
   puts "#{x} をお願いします"
 end
 

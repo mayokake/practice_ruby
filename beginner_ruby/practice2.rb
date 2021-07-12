@@ -1,9 +1,9 @@
-puts 2 + 3 #2-1
+puts 2 + 3 # 2-1
 puts 2 * 2 * 3.14
 
-puts "Ruby"
-puts "abc" + "def"
-puts "123".to_i + "456".to_i
+puts 'Ruby'
+puts 'abc' + 'def'
+puts '123'.to_i + '456'.to_i
 
 coffee = 300
 espresso = 100
@@ -22,6 +22,6 @@ tax = total * 0.08
 puts tax
 puts total + tax
 
-#2-7
+# 2-7
 total = 300 * 2
 puts total
