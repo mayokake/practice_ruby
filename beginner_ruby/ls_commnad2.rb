@@ -1,3 +1,4 @@
+#coding:ASCII-8BIT
 require 'etc'
 require 'optparse'
 
@@ -18,7 +19,7 @@ require 'optparse'
 
 # p params
 
-# Dir.chdir("/usr/bin")
+Dir.chdir("/usr/bin")
 # Dir.chdir("/Users/masataka_ikeda")
 
 # p Dir.pwd
@@ -45,58 +46,115 @@ end
 ## その配列の長さが必要
 
 
-@tate = 3
+# 縦3列の表示を完成させる
 
-# p num_array = array_for_symlink.size
-
-# p thr_dim1 = array_decide.map{|file| file.size}
-
-
-# p thr_dim2 = thr_dim1.max
-
-# p size_dim1 = thr_dim1.size
-p size_dim1 = array_decide.map{|file| file.size}.size
-p array_decide.size
-p amari_keisan = size_dim1.divmod(@tate)
-
-
-# p amari_tasu = Array.new(size_dim1.divmod(3)[1], 0)
-
-
-
-p thr_slice = 
-if size_dim1.divmod(@tate)[1] == 0
-  size_dim1.divmod(@tate)[0]
-else
-  size_dim1.divmod(@tate)[0] + 1
+def last_array # 表示のためのメソッド化 
+  @tate = 3
+  size_dim1 = array_decide.size # 配列の長さ
+  @thr_dim1 = array_decide.map{|file| file.size}.max # 横幅の決定
+  # 3列化のための割る数の確定
+  thr_slice = size_dim1.divmod(@tate)[1] == 0 ? size_dim1.divmod(@tate)[0] : size_dim1.divmod(@tate)[0] + 1
+  # 追加する"""空の文字列の数の取得
+  diff_add =
+  if size_dim1.divmod(@tate)[1] != 0
+    thr_slice - size_dim1.divmod(thr_slice)[1]
+  else
+    0
+  end
+  # 最後の列への空文字追加
+  add_add = Array.new(diff_add, "")
+  # 最後の配列の決定
+  saigo_no_hairetsu = array_decided + add_add
+  # 3行配列の決定
+  thr_dim3 = []
+  saigo_no_hairetsu.each_slice(thr_slice){|s| thr_dim3 << s }
+  thr_dim3
 end
 
-# p thr_slice
-size_dim1.divmod(thr_slice)
-diff_add = thr_slice - size_dim1.divmod(thr_slice)[1]
-add_add = Array.new(diff_add, "")
-saigo_no_hairetsu = array_decided + add_add
-
-thr_dim3 = []
-saigo_no_hairetsu.each_slice(thr_slice){|s| thr_dim3 << s }
-thr_dim3
-
-
-thr_dim4 = thr_dim3.transpose
-@fig = thr_dim4[0].size
-
-# puts ""
-# puts ""
-
-thr_dim4.each do |file|
-  file.each.with_index do |elemental, index|
-    if index == @fig - 1 #3
-      print elemental.ljust(30) + "\n"
-    else
-      print elemental.ljust(30)
+def normal_display(ary)
+  thr_dim4 = ary.transpose
+  fig = thr_dim4[0].size # 表示配列の折返しの決定
+  thr_dim4.each do |file|
+    file.each.with_index do |elemental, index|
+      if index == fig - 1
+        print elemental.ljust(@thr_dim1) + "\n"
+      else
+        print elemental.ljust(@thr_dim1)
+      end
     end
   end
 end
+
+normal_display(last_array)
+
+
+# puts ""
+
+# thr_dim4.each do |file|
+#   file.each.with_index do |elemental, index|
+#     if index == @fig - 1
+#       print elemental.ljust(@thr_dim1) + "\n"
+#     else
+#       print elemental.ljust(@thr_dim1)
+#     end
+#   end
+# end
+
+
+
+# @tate = 3
+# size_dim1 = array_decide.size # 配列の長さ
+# # 幅調整のため
+# @thr_dim1 = array_decide.map{|file| file.size}.max
+# # 配列の縦1列の長さ
+# thr_slice = size_dim1.divmod(@tate)[1] == 0 ? size_dim1.divmod(@tate)[0] : size_dim1.divmod(@tate)[0] + 1
+# # 最後の列の余りの数
+# diff_add =
+# if size_dim1.divmod(@tate)[1] != 0
+#   thr_slice - size_dim1.divmod(thr_slice)[1]
+# else
+#   0
+# end
+
+# # 最後の列への空文字追加
+# add_add = Array.new(diff_add, "")
+# saigo_no_hairetsu = array_decided + add_add
+
+# # 最終的な配列の決定
+# thr_dim3 = []
+# saigo_no_hairetsu.each_slice(thr_slice){|s| thr_dim3 << s }
+# thr_dim3
+
+
+# p num_array = array_for_symlink.size
+# p thr_dim1 = array_decide.map{|file| file.size}
+# p thr_dim2 = thr_dim1.max
+# p size_dim1 = thr_dim1.size
+# p size_dim1 = array_decide.map{|file| file.size}.size
+# p amari_keisan = size_dim1.divmod(@tate)
+# p amari_tasu = Array.new(size_dim1.divmod(3)[1], 0)
+# size_dim1.divmod(thr_slice)
+
+
+
+
+# # thr_dim4 = thr_dim3.transpose
+# p thr_dim4 = normal_display.transpose
+
+# @fig = thr_dim4[0].size # 表示配列の折返しの決定
+
+
+# # puts ""
+
+# thr_dim4.each do |file|
+#   file.each.with_index do |elemental, index|
+#     if index == @fig - 1
+#       print elemental.ljust(@thr_dim1) + "\n"
+#     else
+#       print elemental.ljust(@thr_dim1)
+#     end
+#   end
+# end
 
 # puts ""
 # puts ""
@@ -326,29 +384,29 @@ puts "total #{blocks_number.sum}"
 # p array_for_symlink[0].size
 
 
-matrix = []
-matrix << file_and_permission
-matrix << number_of_links
-matrix << uid
-matrix << gid
-matrix << size
-matrix << date
-matrix << array_decided
-matrix << symlink
+# matrix = []
+# matrix << file_and_permission
+# matrix << number_of_links
+# matrix << uid
+# matrix << gid
+# matrix << size
+# matrix << date
+# matrix << array_decided
+# matrix << symlink
 
-# p matrix
-# p matrix.transpose
+# # p matrix
+# # p matrix.transpose
 
 
-matrix.transpose.each do |file|
-  file.each.with_index do |elemental, index|
-    if file.size == index + 1
-      print elemental + " " + "\n"
-    else
-      print elemental + " "
-    end
-  end
-end
+# matrix.transpose.each do |file|
+#   file.each.with_index do |elemental, index|
+#     if file.size == index + 1
+#       print elemental + " " + "\n"
+#     else
+#       print elemental + " "
+#     end
+#   end
+# end
 
 #### -l 指定がない場合の表示は、インシャルで3列とか、5列とかその数字をつかって後でいかようにも変更できるようにしよう！
 
