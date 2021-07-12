@@ -15,6 +15,7 @@ require 'optparse'
 
 
 @parameter = ARGV.getopts('lar') 
+# p @parameter
 
 
 # p params
@@ -85,7 +86,10 @@ def normal_display(ary)
   end
 end
 
-normal_display(last_array)
+
+# @parameter['l'] ? puts "l-option" : normal_display(last_array)
+
+normal_display(last_array) if @parameter['l'] == false
 
 
 # puts ""
@@ -348,9 +352,43 @@ def blocks_number
   end
 end
 
-puts ""
 
-puts "total #{blocks_number.sum}"
+
+
+def matrix
+  matrix = []
+  matrix << file_and_permission
+  matrix << number_of_links
+  matrix << uid
+  matrix << gid
+  matrix << size
+  matrix << date
+  matrix << array_decided
+  matrix << symlink
+end
+
+# p matrix
+# p matrix.transpose
+
+def another_display(mtx)
+  mtx.transpose.each do |file|
+    file.each.with_index do |elemental, index|
+      if file.size == index + 1
+        print elemental + " " + "\n"
+      else
+        print elemental + " "
+      end
+    end
+  end
+end
+
+# another_display(matrix)
+
+if @parameter['l'] == true
+  puts "total #{blocks_number.sum}"
+  another_display(matrix)
+end
+
 
 
 # p array_for_symlink[0].blocks
