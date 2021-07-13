@@ -5,7 +5,7 @@ require 'optparse'
 
 @parameter = ARGV.getopts('lar')
 
-# Dir.chdir('/usr/bin')
+Dir.chdir('/usr/bin')
 # Dir.chdir("/Users/masataka_ikeda")
 # p Dir.pwd
 
@@ -91,24 +91,9 @@ def rwx(num_string)
 end
 
 def id(num_string2)
-  case num_string2
-  when '7'
-    'rws'
-  when '6'
-    'rwS'
-  when '5'
-    'r-s'
-  when '4'
-    'r-S'
-  when '3'
-    '-ws'
-  when '2'
-    '-wS'
-  when '1'
-    '--s'
-  when '0'
-    '--S'
-  end
+  hash3 = { '7' => 'rws', '6' => 'rwS', '5' => 'r-s', '4' => 'r-S', '3' => '-ws', '2' => '-wS', '1' => '--s',
+            '0' => '--S' }
+  hash3[num_string2]
 end
 
 def file_mode_owner(file1)
@@ -160,7 +145,7 @@ end
 
 def number_of_links
   array_for_symlink.map do |file|
-    file.nlink.to_s.rjust(3)
+    file.nlink.to_s.rjust(4)
   end
 end
 
@@ -182,16 +167,28 @@ def size
   end
 end
 
+def year(file)
+  file.mtime.year.to_s.rjust(5)
+end
+
+def month(file)
+  file.mtime.month.to_s.rjust(2)
+end
+
+def day(file)
+  file.mtime.day.to_s.rjust(2)
+end
+
+def time_ob(file)
+  file.mtime.strftime('%H:%M')
+end
+
 def date
   array_for_symlink.map do |file|
-    year = file.mtime.year.to_s
-    month = file.mtime.month.to_s
-    day = file.mtime.day.to_s
-    time_ob = file.mtime.strftime('%H:%M')
     if ((Time.now - file.mtime) / 60 / 60 / 24).round > 365 / 2
-      "#{month.rjust(2)} #{day.rjust(2)} #{year}"
+      "#{month(file)} #{day(file)} #{year(file)}"
     else
-      "#{month.rjust(2)} #{day.rjust(2)} #{time_ob}"
+      "#{month(file)} #{day(file)} #{time_ob(file)}"
     end
   end
 end
