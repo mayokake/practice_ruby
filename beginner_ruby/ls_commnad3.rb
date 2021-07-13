@@ -79,53 +79,16 @@ normal_display(final_array) if @parameter['l'] == false
 
 def file_type(file1)
   local_file = file1.ftype
-  case local_file
-  when 'file'
-    '-'
-  when 'directory'
-    'd'
-  when 'characterSpecial'
-    'c'
-  when 'blockSpecial'
-    'b'
-  when 'fifo'
-    'p'
-  when 'link'
-    'l'
-  when 'socket'
-    's'
-  when 'unknown'
-    '?'
-  end
+  hash1 = { 'file' =>  '-', 'directory' => 'd', 'characterSpecial' => 'c', 'blockSpecial' => 'b',
+            'fifo' => 'p', 'link' => 'l', 'socket' => 's', 'unknown' => '?' }
+  hash1[local_file]
 end
 
 def rwx(num_string)
-  hash2 = {'7' => 'rwx', '6' => 'rw-', '5' => 'r-x', '4' => 'r--', '3' => '-wx', '2' => '-w-', '1' => '--x', '0' =>'---' }
+  hash2 = { '7' => 'rwx', '6' => 'rw-', '5' => 'r-x', '4' => 'r--', '3' => '-wx', '2' => '-w-', '1' => '--x',
+            '0' => '---' }
   hash2[num_string]
 end
-
-  #   end
-# end
-  # def rwx(num_string)
-#   case num_string
-#   when '7'
-#     'rwx'
-#   when '6'
-#     'rw-'
-#   when '5'
-#     'r-x'
-#   when '4'
-#     'r--'
-#   when '3'
-#     '-wx'
-#   when '2'
-#     '-w-'
-#   when '1'
-#     '--x'
-#   when '0'
-#     '---'
-#   end
-# end
 
 def id(num_string2)
   case num_string2
