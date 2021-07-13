@@ -79,7 +79,7 @@ normal_display(final_array) if @parameter['l'] == false
 
 def file_type(file1)
   local_file = file1.ftype
-  hash1 = { 'file' =>  '-', 'directory' => 'd', 'characterSpecial' => 'c', 'blockSpecial' => 'b',
+  hash1 = { 'file' => '-', 'directory' => 'd', 'characterSpecial' => 'c', 'blockSpecial' => 'b',
             'fifo' => 'p', 'link' => 'l', 'socket' => 's', 'unknown' => '?' }
   hash1[local_file]
 end
