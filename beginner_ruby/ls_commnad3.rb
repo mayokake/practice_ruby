@@ -3,6 +3,11 @@
 require 'etc'
 require 'optparse'
 
+# class 配列を得るクラス
+# 少なくともファイル・タイプを得るクラス
+# あるいは、Longオプション用の表示クラス
+
+
 @parameter = ARGV.getopts('lar')
 
 Dir.chdir('/usr/bin')
@@ -51,27 +56,25 @@ def for_add_strings
   end
 end
 
-# kokokara fine!
-def final_array
-  add_add = Array.new(for_add_strings, '')
-  saigo_no_hairetsu = array_for_r_option + add_add
-  thr_dim3 = []
-  saigo_no_hairetsu.each_slice(length_of_row) { |s| thr_dim3 << s }
-  thr_dim3
+def array_for_transpose
+  ary = array_for_r_option + Array.new(for_add_strings, '')
+  three_dimension_array = []
+  ary.each_slice(length_of_row) { |s| three_dimension_array << s }
+  three_dimension_array
 end
 
-def trans_array
-  final_array.transpose
+def array_in_transpose
+  array_for_transpose.transpose
 end
 
-def fig
-  trans_array[0].size
+def number_of_colums
+  array_in_transpose[0].size
 end
 
-def normal_display(ary)
-  ary.transpose.each do |file|
+def output_display(array)
+  array.transpose.each do |file|
     file.each.with_index do |elemental, index|
-      if index == fig - 1
+      if index == number_of_colums - 1
         print "#{elemental.ljust(width_of_row)}\n"
       else
         print elemental.ljust(width_of_row)
@@ -80,13 +83,16 @@ def normal_display(ary)
   end
 end
 
-normal_display(final_array) if @parameter['l'] == false
+output_display(array_for_transpose) if @parameter['l'] == false
+
+
+
+# class 
 
 def file_type(file1)
-  local_file = file1.ftype
   hash1 = { 'file' => '-', 'directory' => 'd', 'characterSpecial' => 'c', 'blockSpecial' => 'b',
             'fifo' => 'p', 'link' => 'l', 'socket' => 's', 'unknown' => '?' }
-  hash1[local_file]
+  hash1[file1.ftype]
 end
 
 def rwx(num_string)
