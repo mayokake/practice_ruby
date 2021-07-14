@@ -9,49 +9,54 @@ Dir.chdir('/usr/bin')
 # Dir.chdir("/Users/masataka_ikeda")
 # p Dir.pwd
 
-def array_decide
+def array_for_a_option
   @parameter['a'] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
 end
 
-def array_decided
-  @parameter['r'] ? array_decide.reverse : array_decide
+def array_for_r_option
+  @parameter['r'] ? array_for_a_option.reverse : array_for_a_option
 end
 
-def array_for_symlink
-  array_decided.map do |file|
+def array_for_stat
+  array_for_r_option.map do |file|
     File.lstat(file).ftype == 'link' ? File.lstat(file) : File.stat(file)
   end
 end
 
-def n_col
+def number_of_columns
   3
 end
 
-def len_of_array
-  array_decide.size
+def length_of_array
+  array_for_a_option.size
 end
 
-def wid_of_row
-  array_decide.map(&:size).max
+def width_of_row
+  array_for_a_option.map(&:size).max
 end
 
-def len_of_row
-  (len_of_array.divmod(n_col)[1]).zero? ? len_of_array.divmod(n_col)[0] : len_of_array.divmod(n_col)[0] + 1
+def length_of_row
+  if (length_of_array.divmod(number_of_columns)[1]).zero?
+    length_of_array.divmod(number_of_columns)[0]
+  else
+    length_of_array.divmod(number_of_columns)[0] + 1
+  end
 end
 
-def add_str
-  if len_of_array.divmod(n_col)[1] != 0
-    len_of_row - len_of_array.divmod(len_of_row)[1]
+def for_add_strings
+  if length_of_array.divmod(number_of_columns)[1] != 0
+    length_of_row - length_of_array.divmod(length_of_row)[1]
   else
     0
   end
 end
 
+# kokokara fine!
 def final_array
-  add_add = Array.new(add_str, '')
-  saigo_no_hairetsu = array_decided + add_add
+  add_add = Array.new(for_add_strings, '')
+  saigo_no_hairetsu = array_for_r_option + add_add
   thr_dim3 = []
-  saigo_no_hairetsu.each_slice(len_of_row) { |s| thr_dim3 << s }
+  saigo_no_hairetsu.each_slice(length_of_row) { |s| thr_dim3 << s }
   thr_dim3
 end
 
@@ -67,9 +72,9 @@ def normal_display(ary)
   ary.transpose.each do |file|
     file.each.with_index do |elemental, index|
       if index == fig - 1
-        print "#{elemental.ljust(wid_of_row)}\n"
+        print "#{elemental.ljust(width_of_row)}\n"
       else
-        print elemental.ljust(wid_of_row)
+        print elemental.ljust(width_of_row)
       end
     end
   end
@@ -138,31 +143,31 @@ def file_permission(file1)
 end
 
 def file_and_permission
-  array_for_symlink.map do |file|
+  array_for_stat.map do |file|
     file_permission(file)
   end
 end
 
 def number_of_links
-  array_for_symlink.map do |file|
+  array_for_stat.map do |file|
     file.nlink.to_s.rjust(4)
   end
 end
 
 def uid
-  array_for_symlink.map do |file|
+  array_for_stat.map do |file|
     Etc.getpwuid(file.uid).name.rjust(6)
   end
 end
 
 def gid
-  array_for_symlink.map do |file|
+  array_for_stat.map do |file|
     Etc.getgrgid(file.gid).name.rjust(6)
   end
 end
 
 def size
-  array_for_symlink.map do |file|
+  array_for_stat.map do |file|
     file.size.to_s.rjust(9)
   end
 end
@@ -184,7 +189,7 @@ def time_ob(file)
 end
 
 def date
-  array_for_symlink.map do |file|
+  array_for_stat.map do |file|
     if ((Time.now - file.mtime) / 60 / 60 / 24).round > 365 / 2
       "#{month(file)} #{day(file)} #{year(file)}"
     else
@@ -194,8 +199,8 @@ def date
 end
 
 def symlink
-  array_decided.map.with_index do |file, index|
-    if array_for_symlink[index].symlink?
+  array_for_r_option.map.with_index do |file, index|
+    if array_for_stat[index].symlink?
       "-> #{File.readlink(file)}"
     else
       ''
@@ -204,7 +209,7 @@ def symlink
 end
 
 def blocks_number
-  array_for_symlink.map(&:blocks)
+  array_for_stat.map(&:blocks)
 end
 
 def matrix
@@ -215,7 +220,7 @@ def matrix
   matrix << gid
   matrix << size
   matrix << date
-  matrix << array_decided
+  matrix << array_for_r_option
   matrix << symlink
 end
 
