@@ -7,12 +7,41 @@ require 'optparse'
 # 少なくともファイル・タイプを得るクラス
 # あるいは、Longオプション用の表示クラス
 
-
-@parameter = ARGV.getopts('lar')
-
 Dir.chdir('/usr/bin')
 # Dir.chdir("/Users/masataka_ikeda")
 # p Dir.pwd
+
+class Matrix
+  def initialize
+    @parameter = ARGV.getopts('lar')
+  end
+
+  def array_for_a_option
+    @parameter['a'] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
+  end
+
+  def array_for_ar_option
+    @parameter['r'] ? array_for_a_option.reverse : array_for_a_option
+  end
+
+
+
+
+
+  def array_for_stat
+    array_for_ar_option.map do |file|
+      File.lstat(file).ftype == 'link' ? File.lstat(file) : File.stat(file)
+    end
+  end
+end
+
+# # Matrixを作るところはクラス化したい
+
+# test = Testing.new
+# p test.array_for_ar_option
+# p test.array_for_stat
+
+@parameter = ARGV.getopts('lar')
 
 def array_for_a_option
   @parameter['a'] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
@@ -36,8 +65,9 @@ def length_of_array
   array_for_a_option.size
 end
 
+# 最初の最初でこれをつければいい！
 def width_of_row
-  array_for_a_option.map(&:size).max
+  array_for_a_option.map(&:size).max > 25 ? array_for_a_option.map(&:size).max : 25
 end
 
 def length_of_row
@@ -63,21 +93,16 @@ def array_for_transpose
   three_dimension_array
 end
 
-def array_in_transpose
-  array_for_transpose.transpose
-end
-
-def number_of_colums
-  array_in_transpose[0].size
-end
-
 def output_display(array)
-  array.transpose.each do |file|
+  array.transpose.each do |file| 
+    # transposeは外に出す
     file.each.with_index do |elemental, index|
-      if index == number_of_colums - 1
-        print "#{elemental.ljust(width_of_row)}\n"
+      if file.size == index + 1 # index == number_of_columns - 1
+        # print "#{elemental.ljust(width_of_row)}\n"
+        print "#{elemental.ljust(45)}\n"
       else
-        print elemental.ljust(width_of_row)
+        # print elemental.ljust(width_of_row)
+        print elemental.ljust(45)
       end
     end
   end
@@ -85,9 +110,7 @@ end
 
 output_display(array_for_transpose) if @parameter['l'] == false
 
-
-
-# class 
+# class
 
 def file_type(file1)
   hash1 = { 'file' => '-', 'directory' => 'd', 'characterSpecial' => 'c', 'blockSpecial' => 'b',
