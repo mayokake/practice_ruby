@@ -3,8 +3,9 @@
 require 'etc'
 require 'optparse'
 
-Dir.chdir('/usr/bin')
-# Dir.chdir("/Users/masataka_ikeda")
+# Dir.chdir('/usr/bin')
+# Dir.chdir('/usr/sbin')
+Dir.chdir("/Users/masataka_ikeda")
 # p Dir.pwd
 
 # Get the basic array for the output
@@ -30,6 +31,38 @@ class ArrayForMatrix
       File.lstat(string).ftype == 'link' ? File.lstat(string) : File.stat(string)
     end
   end
+
+  def string_uid
+    array_for_stat.map do |string|
+      string.uid
+    end
+  end
+
+  def uid
+    string_uid.map do |string|
+      Etc.getpwuid(string).name
+    end
+  end
+
+  def width_of_uid
+    uid.map(&:size).max
+  end
+
+  def string_gid
+    array_for_stat.map do |string|
+      string.gid
+    end
+  end
+
+  def gid
+    string_gid.map do |string|
+      Etc.getgrgid(string).name
+    end
+  end
+
+  def width_of_gid
+    gid.map(&:size).max
+  end
 end
 
 # Describing the matrix without the long option
@@ -46,7 +79,7 @@ class MtxForNoL
     @array.size
   end
 
-  def width_of_row
+  def width_of_row #for adjustment of the width of file names displayed
     @array.map(&:size).max > 25 ? @array.map(&:size).max : 25
   end
 
@@ -157,12 +190,14 @@ class ModeAndPermission
   end
 end
 
-# Describing the matrix without the long option
+# Describing the matrix with the long option
 class MtxForL
-  def initialize(array1, array2, array3)
+  def initialize(array1, array2, array3, array4, array5)
     @array1 = array1
     @array2 = array2
     @array3 = array3
+    @array4 = array4
+    @array5 = array5
   end
 
   def number_of_links
@@ -171,17 +206,44 @@ class MtxForL
     end
   end
 
-  def uid
-    @array1.map do |file|
-      Etc.getpwuid(file.uid).name.rjust(6)
+  def string_uid
+    @array1.map do |string|
+      string.uid
     end
   end
 
-  def gid
-    @array1.map do |file|
-      Etc.getgrgid(file.gid).name.rjust(6)
+  def uid
+    @array1.map do |string|
+    # string_uid.map do |string|
+      Etc.getpwuid(string.uid).name.rjust(@array4)
     end
   end
+
+  # def width_of_uid
+  #   uid.map(&:size).max
+  # end
+
+  # def uid_adjustment
+  #   uid.map do |string|
+  #     string.ljust(20) #@array4)
+  #   end
+  # end
+
+  def gid
+    @array1.map do |file|
+      Etc.getgrgid(file.gid).name.rjust(@array5)
+    end
+  end
+
+  # def width_of_gid
+  #   gid.map(&:size).max
+  # end
+
+  # def gid_adjustment
+  #   gid.map do |file|
+  #     file.rjust(width_of_gid)
+  #   end
+  # end
 
   def size
     @array1.map do |file|
@@ -215,7 +277,7 @@ class MtxForL
     end
   end
 
-  def symlink
+  def symbolic_link
     @array2.map.with_index do |file, index|
       if @array1[index].symlink?
         "-> #{File.readlink(file)}"
@@ -234,11 +296,13 @@ class MtxForL
     matrix << @array3
     matrix << number_of_links
     matrix << uid
+    # matrix << uid_adjustment # uid
     matrix << gid
+    # matrix << gid_adjustment # gid
     matrix << size
     matrix << date
     matrix << @array2
-    matrix << symlink
+    matrix << symbolic_link
   end
 
   def transposed_matrix
@@ -274,6 +338,8 @@ basic_array = ArrayForMatrix.new
 for_ar_option = basic_array.array_for_ar_option
 for_statlink = basic_array.array_for_stat
 condition = basic_array.l_option
+width_uid = basic_array.width_of_uid
+width_gid = basic_array.width_of_gid
 
 array_with_no_l_option = MtxForNoL.new(for_ar_option)
 matrix1 = array_with_no_l_option.transposed_array
@@ -281,7 +347,7 @@ matrix1 = array_with_no_l_option.transposed_array
 trail00 = ModeAndPermission.new(for_statlink)
 trail00.file_and_permission
 
-array_with_l_option = MtxForL.new(for_statlink, for_ar_option, trail00.file_and_permission)
+array_with_l_option = MtxForL.new(for_statlink, for_ar_option, trail00.file_and_permission, width_uid, width_gid)
 matrix2 = array_with_l_option.transposed_matrix
 
 if condition == true
@@ -290,3 +356,15 @@ if condition == true
 else
   output_display(matrix1)
 end
+
+
+# trl12 = for_statlink.map do |file|
+#   Etc.getpwuid(file.uid).name
+# end
+
+# trial15 =trl12.map do |file|
+#   file.size
+# end
+
+# p trial15.max
+
