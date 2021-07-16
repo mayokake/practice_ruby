@@ -3,12 +3,12 @@
 require 'etc'
 require 'optparse'
 
-# Dir.chdir('/usr/bin')
+Dir.chdir('/usr/bin')
 # Dir.chdir('/usr/sbin')
-Dir.chdir("/Users/masataka_ikeda")
+# Dir.chdir("/Users/masataka_ikeda")
 # p Dir.pwd
 
-# Get the basic array for the output
+# Get the basic array for the output and constant needed in other class
 class ArrayForMatrix
   def initialize
     @parameter = ARGV.getopts('lar')
@@ -33,14 +33,14 @@ class ArrayForMatrix
   end
 
   def string_uid
-    array_for_stat.map do |string|
-      string.uid
+    array_for_stat.map do |stat|
+      stat.uid
     end
   end
 
   def uid
-    string_uid.map do |string|
-      Etc.getpwuid(string).name
+    string_uid.map do |id|
+      Etc.getpwuid(id).name
     end
   end
 
@@ -49,14 +49,14 @@ class ArrayForMatrix
   end
 
   def string_gid
-    array_for_stat.map do |string|
-      string.gid
+    array_for_stat.map do |stat|
+      stat.gid
     end
   end
 
   def gid
-    string_gid.map do |string|
-      Etc.getgrgid(string).name
+    string_gid.map do |id|
+      Etc.getgrgid(id).name
     end
   end
 
@@ -107,14 +107,14 @@ class MtxForNoL
     divisible_array.map { |string| string.ljust(width_of_row) }
   end
 
-  def array_for_transpose
+  def matrix_for_transpose
     three_dimension_array = []
     size_ajustment.each_slice(length_of_row) { |string| three_dimension_array << string }
     three_dimension_array
   end
 
-  def transposed_array
-    array_for_transpose.transpose
+  def transposed_matrix_without_l_option
+    matrix_for_transpose.transpose
   end
 end
 
@@ -152,9 +152,9 @@ class ModeAndPermission
     end
   end
 
-  def file_mode_group(file1)
-    local_mode = file1.mode.to_s(8).slice(-2)
-    id_mode = file1.mode.to_s(8).slice(-4)
+  def file_mode_group(file)
+    local_mode = file.mode.to_s(8).slice(-2)
+    id_mode = file.mode.to_s(8).slice(-4)
     if id_mode == '2'
       id(local_mode)
     else
@@ -162,9 +162,9 @@ class ModeAndPermission
     end
   end
 
-  def file_mode_other(file1)
-    local_mode = file1.mode.to_s(8).slice(-1)
-    sticky_mode = file1.mode.to_s(8).slice(-4)
+  def file_mode_other(file)
+    local_mode = file.mode.to_s(8).slice(-1)
+    sticky_mode = file.mode.to_s(8).slice(-4)
     if local_mode == '4' && sticky_mode == '1'
       'r-T'
     elsif local_mode == '5' && sticky_mode == '1'
@@ -174,18 +174,18 @@ class ModeAndPermission
     end
   end
 
-  def file_permission(file1)
+  def file_permission(file)
     arr_atribute = []
-    arr_atribute << file_type(file1)
-    arr_atribute << file_mode_owner(file1)
-    arr_atribute << file_mode_group(file1)
-    arr_atribute << file_mode_other(file1)
+    arr_atribute << file_type(file)
+    arr_atribute << file_mode_owner(file)
+    arr_atribute << file_mode_group(file)
+    arr_atribute << file_mode_other(file)
     arr_atribute.join.ljust(11)
   end
 
   def file_and_permission
-    @array1.map do |file|
-      file_permission(file)
+    @array1.map do |stat|
+      file_permission(stat)
     end
   end
 end
@@ -201,86 +201,65 @@ class MtxForL
   end
 
   def number_of_links
-    @array1.map do |file|
-      file.nlink.to_s.rjust(4)
+    @array1.map do |stat|
+      stat.nlink.to_s.rjust(4)
     end
   end
 
   def string_uid
-    @array1.map do |string|
-      string.uid
+    @array1.map do |stat|
+      stat.uid
     end
   end
 
   def uid
-    @array1.map do |string|
-    # string_uid.map do |string|
-      Etc.getpwuid(string.uid).name.rjust(@array4)
+    @array1.map do |stat|
+      Etc.getpwuid(stat.uid).name.rjust(@array4)
     end
   end
-
-  # def width_of_uid
-  #   uid.map(&:size).max
-  # end
-
-  # def uid_adjustment
-  #   uid.map do |string|
-  #     string.ljust(20) #@array4)
-  #   end
-  # end
 
   def gid
-    @array1.map do |file|
-      Etc.getgrgid(file.gid).name.rjust(@array5)
+    @array1.map do |stat|
+      Etc.getgrgid(stat.gid).name.rjust(@array5)
     end
   end
-
-  # def width_of_gid
-  #   gid.map(&:size).max
-  # end
-
-  # def gid_adjustment
-  #   gid.map do |file|
-  #     file.rjust(width_of_gid)
-  #   end
-  # end
 
   def size
-    @array1.map do |file|
-      file.size.to_s.rjust(9)
+    @array1.map do |stat|
+      stat.size.to_s.rjust(9)
     end
   end
 
-  def year(file)
-    file.mtime.year.to_s.rjust(5)
+  def year(stat)
+    stat.mtime.year.to_s.rjust(5)
   end
 
-  def month(file)
-    file.mtime.month.to_s.rjust(2)
+  def month(stat)
+    stat.mtime.month.to_s.rjust(2)
   end
 
-  def day(file)
-    file.mtime.day.to_s.rjust(2)
+  def day(stat)
+    stat.mtime.day.to_s.rjust(2)
   end
 
-  def time_ob(file)
-    file.mtime.strftime('%H:%M')
+  def time_ob(stat)
+    stat.mtime.strftime('%H:%M')
   end
 
   def date
-    @array1.map do |file|
-      if ((Time.now - file.mtime) / 60 / 60 / 24).round > 365 / 2
-        "#{month(file)} #{day(file)} #{year(file)}"
+    @array1.map do |stat|
+      if ((Time.now - stat.mtime) / 60 / 60 / 24).round > 365 / 2
+        "#{month(stat)} #{day(stat)} #{year(stat)}"
       else
-        "#{month(file)} #{day(file)} #{time_ob(file)}"
+        "#{month(stat)} #{day(stat)} #{time_ob(stat)}"
       end
     end
   end
 
   def symbolic_link
-    @array2.map.with_index do |file, index|
+    @array2.map.with_index do |string, index|
       if @array1[index].symlink?
-        "-> #{File.readlink(file)}"
+        "-> #{File.readlink(string)}"
       else
         ''
       end
@@ -296,9 +275,7 @@ class MtxForL
     matrix << @array3
     matrix << number_of_links
     matrix << uid
-    # matrix << uid_adjustment # uid
     matrix << gid
-    # matrix << gid_adjustment # gid
     matrix << size
     matrix << date
     matrix << @array2
@@ -310,7 +287,7 @@ class MtxForL
   end
 end
 
-def output_display(array)
+def output_without_l_option(array)
   array.each do |file|
     file.each.with_index do |elemental, index|
       if file.size == index + 1
@@ -322,7 +299,7 @@ def output_display(array)
   end
 end
 
-def output_with_long(mtx)
+def output_with_l_option(mtx)
   mtx.each do |file|
     file.each.with_index do |elemental, index|
       if file.size == index + 1
@@ -335,36 +312,27 @@ def output_with_long(mtx)
 end
 
 basic_array = ArrayForMatrix.new
+
 for_ar_option = basic_array.array_for_ar_option
 for_statlink = basic_array.array_for_stat
+
 condition = basic_array.l_option
+
 width_uid = basic_array.width_of_uid
 width_gid = basic_array.width_of_gid
 
 array_with_no_l_option = MtxForNoL.new(for_ar_option)
-matrix1 = array_with_no_l_option.transposed_array
+matrix1 = array_with_no_l_option.transposed_matrix_without_l_option
 
-trail00 = ModeAndPermission.new(for_statlink)
-trail00.file_and_permission
+permissions = ModeAndPermission.new(for_statlink)
+argument_of_permissions = permissions.file_and_permission
 
-array_with_l_option = MtxForL.new(for_statlink, for_ar_option, trail00.file_and_permission, width_uid, width_gid)
+array_with_l_option = MtxForL.new(for_statlink, for_ar_option, argument_of_permissions, width_uid, width_gid)
 matrix2 = array_with_l_option.transposed_matrix
 
 if condition == true
   puts "total #{array_with_l_option.blocks_number.sum}"
-  output_with_long(matrix2)
+  output_with_l_option(matrix2)
 else
-  output_display(matrix1)
+  output_without_l_option(matrix1)
 end
-
-
-# trl12 = for_statlink.map do |file|
-#   Etc.getpwuid(file.uid).name
-# end
-
-# trial15 =trl12.map do |file|
-#   file.size
-# end
-
-# p trial15.max
-
