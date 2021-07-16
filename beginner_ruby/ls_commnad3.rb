@@ -33,9 +33,7 @@ class ArrayForMatrix
   end
 
   def string_uid
-    array_for_stat.map do |stat|
-      stat.uid
-    end
+    array_for_stat.map(&:uid)
   end
 
   def uid
@@ -49,9 +47,7 @@ class ArrayForMatrix
   end
 
   def string_gid
-    array_for_stat.map do |stat|
-      stat.gid
-    end
+    array_for_stat.map(&:gid)
   end
 
   def gid
@@ -79,7 +75,8 @@ class MtxForNoL
     @array.size
   end
 
-  def width_of_row #for adjustment of the width of file names displayed
+  # for adjustment of the width of file names displayed
+  def width_of_row
     @array.map(&:size).max > 25 ? @array.map(&:size).max : 25
   end
 
@@ -207,9 +204,7 @@ class MtxForL
   end
 
   def string_uid
-    @array1.map do |stat|
-      stat.uid
-    end
+    @array1.map(&:uid)
   end
 
   def uid
