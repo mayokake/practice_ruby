@@ -3,17 +3,22 @@
 class Bowling
   def initialize(score)
     @score = score
+    p @score
+    @sc = @score[0].split(',')
+    p @sc
+    @basic_score = []
+    @sc.each { |s| s == 'X' ? @basic_score.push(10, 0) : @basic_score.push(s.to_i) }
+    @basic_score
+    p @basic_score
   end
 
-  def scores
-    debug_with_sleep('scores')
-    @score[0].split(',')
-  end
+  # def scores
+  #   @sc = @score[0].split(',')
+  # end
 
   def basic_score
-    debug_with_sleep('basic_score')
     shots = []
-    scores.each { |s| s == 'X' ? shots.push(10, 0) : shots.push(s.to_i) }
+    @sc.each { |s| s == 'X' ? shots.push(10, 0) : shots.push(s.to_i) }
     shots
   end
 
@@ -39,12 +44,12 @@ class Bowling
 
   def array_for_strike
     shots_for_strike = []
-    scores.each { |s| s == 'X' ? shots_for_strike.push(10) : shots_for_strike.push(s.to_i) }
+    @scores.each { |s| s == 'X' ? shots_for_strike.push(10) : shots_for_strike.push(s.to_i) }
     shots_for_strike
   end
 
   def strikes_in_array
-    scores.each_index.select { |i| scores[i] == 'X' }
+    @scores.each_index.select { |i| @scores[i] == 'X' }
   end
 
   def point(str)
@@ -61,11 +66,6 @@ class Bowling
       points_strike += strike_points_extra(num) if !point(num + 2).nil? && !point(num + 3).nil?
     end
     points_strike
-  end
-
-  def debug_with_sleep(name)
-    puts name
-    sleep 0.1
   end
 end
 
