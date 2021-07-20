@@ -36,14 +36,14 @@ class ArrayForMatrix
     @parameter['l']
   end
 
-  def array_for_stat
-    # debug_with_sleep(array_for_stat)
-    # stat =
-    # @array_for_ar_option.map do |string|
-    #   File.lstat(string).ftype == 'link' ? File.lstat(string) : File.stat(string)
-    # end
-    @array_for_stat
-  end
+  # def array_for_stat
+  #   # debug_with_sleep(array_for_stat)
+  #   # stat =
+  #   # @array_for_ar_option.map do |string|
+  #   #   File.lstat(string).ftype == 'link' ? File.lstat(string) : File.stat(string)
+  #   # end
+  #   @array_for_stat
+  # end
 
   def string_uid
     string_uid = @array_for_stat.map(&:uid)
@@ -107,6 +107,7 @@ class MtxForNoL
   end
 
   def length_of_row
+    debug_with_sleep(length_of_row)
     length_of_array
     if (@length_of_array.divmod(number_of_columns)[1]).zero?
       @length_of_array.divmod(number_of_columns)[0]
@@ -116,8 +117,8 @@ class MtxForNoL
   end
 
   def number_of_adding_strings
-    if length_of_array.divmod(number_of_columns)[1] != 0
-      length_of_row - length_of_array.divmod(length_of_row)[1]
+    if @length_of_array.divmod(number_of_columns)[1] != 0
+      @length_of_row - @length_of_array.divmod(length_of_row)[1]
     else
       0
     end
@@ -134,7 +135,7 @@ class MtxForNoL
 
   def matrix_for_transpose
     three_dimension_array = []
-    size_ajustment.each_slice(length_of_row) { |string| three_dimension_array << string }
+    size_ajustment.each_slice(@length_of_row) { |string| three_dimension_array << string }
     three_dimension_array
   end
 
