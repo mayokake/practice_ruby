@@ -9,7 +9,6 @@ require 'optparse'
 # p Dir.pwd
 
 parameter = ARGV.getopts('lar')
-
 l_option = parameter['l']
 
 array_for_a_option = parameter['a'] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
@@ -19,21 +18,67 @@ array_for_stat = array_for_ar_option.map {|string| File.lstat(string).ftype == '
 
 
 # Describing the matrix without the long option
-array_without_l_option = array_for_ar_option
-number_of_columns = 3
-length_of_array_without_l_option = array_for_ar_option.size
+class MatrixWithoutLong
+  COLUMNS = 3
+  def self.transposed_matrix(array)
+    matrix = MatrixWithoutLong.new(array)
+    matrix.transposed_array
+  end
 
-width_of_row_without_l_option = array_for_ar_option.map(&:size).max > 25 ? array_for_ar_option.map(&:size).max : 25
+  def initialize(array)
+    @array = array
+    @length = @array.size
+    @condition = @length.divmod(COLUMNS)
+    @max_size_in_array = @array.map(&:size).max
+  end
 
-condition_length = length_of_array_without_l_option.divmod(number_of_columns)
-condition_length[1].zero?
-length_of_row = condition_length[1].zero? ? condition_length[0] : condition_length[0] + 1
-number_of_adding_strings = condition_length[1].zero? ? 0 : length_of_row - length_of_array_without_l_option.divmod(length_of_row)[1]
-divisible_array = array_without_l_option + Array.new(number_of_adding_strings, '')
-size_ajustment = divisible_array.map { |string| string.ljust(width_of_row_without_l_option) }
-matrix_for_transpose = size_ajustment.each_slice(length_of_row).to_a
+  def row_length
+    @condition[1].zero? ? @condition[0] : @condition[0] + 1
+  end
 
-transposed_matrix_without_l_option = matrix_for_transpose.transpose
+  def row_width
+    @max_size_in_array > 25 ? @max_size_in_array : 25
+  end
+  
+  def divisible_array
+    adding_string_num = row_length - @length.divmod(row_length)[1]
+    divisible_array = @array + Array.new(adding_string_num, '')
+    @size_ajustment = divisible_array.map { |string| string.ljust(row_width) }
+  end
+
+  def transposed_array
+    divisible_array.each_slice(row_length).to_a.transpose
+  end
+end
+
+mtx_no_l = MatrixWithoutLong.transposed_matrix(array_for_ar_option)
+# p mtx_no_l
+
+  #   # condition = length_of_array.divmod(COLUMNS)[1]
+  #   # length = condition.zero? ? conditon[0] : condition[0] + 1
+  #   # adding_strings = condition.zero? ? 0 : length_of_row - length_of_array_without_l_option.divmod(length_of_row)[1]
+
+
+
+  # # array_without_l_option = array_for_ar_option
+  # length_of_array = array.size
+
+  # # サイズを入れたアレイを定義する必要がある。
+  # max_size_in_array = array.map(&:size).max
+  # width_of_row = max_size_in_array > 25 ? max_size_in_array : 25
+  
+  
+  # length = condition[1].zero? ? conditon[0] : condition[0] + 1
+
+  # # condition_length[1].zero?
+  # length_of_row = condition_length[1].zero? ? condition_length[0] : condition_length[0] + 1
+  
+  # adding_strings = condition_length[1].zero? ? 0 : length_of_row - length_of_array_without_l_option.divmod(length_of_row)[1]
+
+  # divisible_array = array_without_l_option + Array.new(number_of_adding_strings, '')
+  # size_ajustment = divisible_array.map { |string| string.ljust(width_of_row_without_l_option) }
+  # matrix_for_transpose = size_ajustment.each_slice(length_of_row).to_a
+  # transposed_matrix_without_l_option = matrix_for_transpose.transpose
 
 def output_without_l_option(array)
   array.each do |file|
@@ -49,7 +94,7 @@ end
 
 # p array_without_l_option
 
-# ##### output_without_l_option(transposed_matrix_without_l_option)
+output_without_l_option(mtx_no_l)
 
 # file permission
 class ModeAndPermission
@@ -146,7 +191,7 @@ def links_uid_gid_size(array)
   mini_matrix << size    
 end
 
-p links_uid_gid_size(array_for_stat).size
+# p links_uid_gid_size(array_for_stat).size
 
 class DateClassObj
   def self.date_object(array)
@@ -196,11 +241,11 @@ end
 
 # p blocks_number = array_for_stat.map(&:blocks)
 
-p ModeAndPermission.my_file_permission(array_for_stat).size
-p links_uid_gid_size(array_for_stat).size
-p DateClassObj.date_object(array_for_stat).size
-p array_for_ar_option.size
-p symbolic_link.size
+ModeAndPermission.my_file_permission(array_for_stat).size
+links_uid_gid_size(array_for_stat).size
+DateClassObj.date_object(array_for_stat).size
+array_for_ar_option.size
+symbolic_link.size
 
 
 matrix = []
