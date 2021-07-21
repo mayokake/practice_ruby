@@ -3,7 +3,7 @@
 require 'etc'
 require 'optparse'
 
-Dir.chdir('/usr/bin')
+# Dir.chdir('/usr/bin')
 # Dir.chdir('/usr/sbin')
 # Dir.chdir("/Users/masataka_ikeda")
 # p Dir.pwd
@@ -12,12 +12,12 @@ parameter = ARGV.getopts('lar')
 l_option = parameter['l']
 array_for_a_option = parameter['a'] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
 array_for_ar_option = parameter['r'] ? array_for_a_option.reverse : array_for_a_option
-array_for_stat = 
-array_for_ar_option.map do |string| 
+array_for_stat = array_for_ar_option.map do |string|
   File.lstat(string).ftype == 'link' ? File.lstat(string) : File.stat(string)
 end
 block_number = array_for_stat.map(&:blocks).sum
 
+# Matrix without long option
 class MatrixWithoutLong
   COLUMNS = 3
   def self.transposed_matrix(array)
@@ -39,7 +39,7 @@ class MatrixWithoutLong
   def row_width
     @max_size_in_array > 25 ? @max_size_in_array : 25
   end
-  
+
   def divisible_array
     adding_string_num = row_length - @length.divmod(row_length)[1]
     divisible_array = @array + Array.new(adding_string_num, '')
@@ -63,11 +63,11 @@ class ModeAndPermission
   def initialize(array1)
     @array1 = array1
     @hash1 = { 'file' => '-', 'directory' => 'd', 'characterSpecial' => 'c', 'blockSpecial' => 'b',
-              'fifo' => 'p', 'link' => 'l', 'socket' => 's', 'unknown' => '?' }
+               'fifo' => 'p', 'link' => 'l', 'socket' => 's', 'unknown' => '?' }
     @hash2 = { '7' => 'rwx', '6' => 'rw-', '5' => 'r-x', '4' => 'r--', '3' => '-wx', '2' => '-w-', '1' => '--x',
-              '0' => '---' }
+               '0' => '---' }
     @hash3 = { '7' => 'rws', '6' => 'rwS', '5' => 'r-s', '4' => 'r-S', '3' => '-ws', '2' => '-wS', '1' => '--s',
-              '0' => '--S' }
+               '0' => '--S' }
   end
 
   def file_and_permission
@@ -134,34 +134,36 @@ end
 
 ModeAndPermission.my_file_permission(array_for_stat)
 
-class LinkAndOthers
-  def self.link_etc(array)
-    object = LinkAndOthers.new(array)
-    object.link_uid_gid_size
+# LinkAndOthers
+class Others
+  def self.etc(array)
+    object = Others.new(array)
+    object.uid_gid
   end
 
   def initialize(array)
     @array = array
   end
 
-  def link_uid_gid_size
-    link = @array.map { |stat| stat.nlink.to_s.rjust(4) }
-    width_of_uid = @array.map { |stat| Etc.getpwuid(stat.uid).name.size }.max
-    uid =  @array.map { |stat| Etc.getpwuid(stat.uid).name.rjust(width_of_uid) }
-    width_of_gid = @array.map { |stat| Etc.getgrgid(stat.gid).name.size }.max
+  def width_of_uid
+    @array.map { |stat| Etc.getpwuid(stat.uid).name.size }.max
+  end
+
+  def width_of_gid
+    @array.map { |stat| Etc.getgrgid(stat.gid).name.size }.max
+  end
+
+  def uid_gid
+    uid = @array.map { |stat| Etc.getpwuid(stat.uid).name.rjust(width_of_uid) }
     gid = @array.map { |stat| Etc.getgrgid(stat.gid).name.rjust(width_of_gid) }
-    size = @array.map {|stat| stat.size.to_s.rjust(9) }
 
     matrix = []
-    matrix << link
     matrix << uid
     matrix << gid
-    matrix << size    
   end
 end
 
-LinkAndOthers.link_etc(array_for_stat)
-
+# comment
 class DateClassObj
   def self.date_object(array)
     date_object = DateClassObj.new(array)
@@ -183,7 +185,7 @@ class DateClassObj
   end
 
   private
-  
+
   def year(stat)
     stat.mtime.year.to_s.rjust(5)
   end
@@ -191,22 +193,29 @@ class DateClassObj
   def month(stat)
     stat.mtime.month.to_s.rjust(2)
   end
-  
+
   def day(stat)
     stat.mtime.day.to_s.rjust(2)
   end
-  
+
   def time_obj(stat)
     stat.mtime.strftime('%H:%M')
   end
 end
 
-DateClassObj.date_object(array_for_stat)
-
+# comment
 class MatrixWithLong
   def initialize(array1, array2)
     @array1 = array1
     @array2 = array2
+  end
+
+  def link
+    @array2.map { |stat| stat.nlink.to_s.rjust(4) }
+  end
+
+  def size
+    @array2.map { |stat| stat.size.to_s.rjust(9) }
   end
 
   def symbolic_link
@@ -214,11 +223,13 @@ class MatrixWithLong
       @array2[index].symlink? ? "-> #{File.readlink(string)}" : ''
     end
   end
-  
+
   def matrix_with_long
     matrix = []
     matrix << ModeAndPermission.my_file_permission(@array2)
-    matrix = matrix + LinkAndOthers.link_etc(@array2)
+    matrix << link
+    matrix += Others.etc(@array2)
+    matrix << size
     matrix << DateClassObj.date_object(@array2)
     matrix << @array1
     matrix << symbolic_link
