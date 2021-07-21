@@ -8,23 +8,34 @@ Dir.chdir('/usr/bin')
 # Dir.chdir("/Users/masataka_ikeda")
 # p Dir.pwd
 
+parameter = ARGV.getopts('lar')
+l_option = parameter['l']
+p l_option.class
+array_for_a_option = parameter['a'] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
+array_for_ar_option = parameter['r'] ? array_for_a_option.reverse : array_for_a_option
+array_for_stat = array_for_ar_option.map do |string|
+  File.lstat(string).ftype == 'link' ? File.lstat(string) : File.stat(string)
+end
+
+
 # Get the basic array for the output and constant needed in other class
 class ArrayForMatrix
   def initialize
     @parameter = ARGV.getopts('lar')
+    @l_option = @parameter['l']
     @array_for_a_option = @parameter['a'] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
-    @array_for_ar_option = @parameter['r'] ? array_for_a_option.reverse : array_for_a_option
+    @array_for_ar_option = @parameter['r'] ? @array_for_a_option.reverse : @array_for_a_option
     @array_for_stat =
     @array_for_ar_option.map do |string|
       File.lstat(string).ftype == 'link' ? File.lstat(string) : File.stat(string)
     end
   end
 
-  def array_for_a_option
-    # debug_with_sleep(array_for_a_option)
-    # array_for_a_option = @parameter['a'] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
-    @array_for_a_option # = array_for_a_option
-  end
+  # def array_for_a_option
+  #   debug_with_sleep(array_for_a_option)
+  #   # array_for_a_option = @parameter['a'] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
+  #   @array_for_a_option # = array_for_a_option
+  # end
 
   def array_for_ar_option
     # debug_with_sleep(array_for_ar_option)
@@ -36,14 +47,14 @@ class ArrayForMatrix
     @parameter['l']
   end
 
-  # def array_for_stat
-  #   # debug_with_sleep(array_for_stat)
-  #   # stat =
-  #   # @array_for_ar_option.map do |string|
-  #   #   File.lstat(string).ftype == 'link' ? File.lstat(string) : File.stat(string)
-  #   # end
-  #   @array_for_stat
-  # end
+  def array_for_stat
+    # debug_with_sleep(array_for_stat)
+    # stat =
+    # @array_for_ar_option.map do |string|
+    #   File.lstat(string).ftype == 'link' ? File.lstat(string) : File.stat(string)
+    # end
+    @array_for_stat
+  end
 
   def string_uid
     string_uid = @array_for_stat.map(&:uid)
@@ -89,6 +100,7 @@ end
 class MtxForNoL
   def initialize(array)
     @array = array
+    # @number_of_columns = 3
   end
 
   def number_of_columns
@@ -102,12 +114,11 @@ class MtxForNoL
 
   # for adjustment of the width of file names displayed
   def width_of_row
-    test = @array.map(&:size).max > 25 ? @array.map(&:size).max : 25
-    @width_of_row = test
+    @array.map(&:size).max > 25 ? @array.map(&:size).max : 25
   end
 
   def length_of_row
-    debug_with_sleep(length_of_row)
+    # debug_with_sleep(length_of_row)
     length_of_array
     if (@length_of_array.divmod(number_of_columns)[1]).zero?
       @length_of_array.divmod(number_of_columns)[0]
@@ -117,8 +128,8 @@ class MtxForNoL
   end
 
   def number_of_adding_strings
-    if @length_of_array.divmod(number_of_columns)[1] != 0
-      @length_of_row - @length_of_array.divmod(length_of_row)[1]
+    if length_of_array.divmod(number_of_columns)[1] != 0
+      length_of_row - @length_of_array.divmod(length_of_row)[1]
     else
       0
     end
@@ -130,12 +141,12 @@ class MtxForNoL
 
   def size_ajustment
     width_of_row
-    divisible_array.map { |string| string.ljust(@width_of_row) }
+    divisible_array.map { |string| string.ljust(width_of_row) }
   end
 
   def matrix_for_transpose
     three_dimension_array = []
-    size_ajustment.each_slice(@length_of_row) { |string| three_dimension_array << string }
+    size_ajustment.each_slice(length_of_row) { |string| three_dimension_array << string }
     three_dimension_array
   end
 
@@ -341,28 +352,28 @@ def output_with_l_option(mtx)
   end
 end
 
-basic_array = ArrayForMatrix.new
+# basic_array = ArrayForMatrix.new
 
-for_ar_option = basic_array.array_for_ar_option
-for_statlink = basic_array.array_for_stat
+# for_ar_option = basic_array.array_for_ar_option
+# for_statlink = basic_array.array_for_stat
 
-condition = basic_array.l_option
+# condition = basic_array.l_option
 
-width_uid = basic_array.width_of_uid
-width_gid = basic_array.width_of_gid
+# width_uid = basic_array.width_of_uid
+# width_gid = basic_array.width_of_gid
 
-array_with_no_l_option = MtxForNoL.new(for_ar_option)
-matrix1 = array_with_no_l_option.transposed_matrix_without_l_option
+# array_with_no_l_option = MtxForNoL.new(for_ar_option)
+# matrix1 = array_with_no_l_option.transposed_matrix_without_l_option
 
-permissions = ModeAndPermission.new(for_statlink)
-argument_of_permissions = permissions.file_and_permission
+# permissions = ModeAndPermission.new(for_statlink)
+# argument_of_permissions = permissions.file_and_permission
 
-array_with_l_option = MtxForL.new(for_statlink, for_ar_option, argument_of_permissions, width_uid, width_gid)
-matrix2 = array_with_l_option.transposed_matrix
+# array_with_l_option = MtxForL.new(for_statlink, for_ar_option, argument_of_permissions, width_uid, width_gid)
+# matrix2 = array_with_l_option.transposed_matrix
 
-if condition == true
-  puts "total #{array_with_l_option.blocks_number.sum}"
-  output_with_l_option(matrix2)
-else
-  output_without_l_option(matrix1)
-end
+# if condition == true
+#   puts "total #{array_with_l_option.blocks_number.sum}"
+#   output_with_l_option(matrix2)
+# else
+#   output_without_l_option(matrix1)
+# end
