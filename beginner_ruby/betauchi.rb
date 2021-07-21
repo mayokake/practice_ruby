@@ -18,8 +18,6 @@ array_for_ar_option.map do |string|
 end
 block_number = array_for_stat.map(&:blocks).sum
 
-
-
 class MatrixWithoutLong
   COLUMNS = 3
   def self.transposed_matrix(array)
@@ -54,20 +52,6 @@ class MatrixWithoutLong
 end
 
 mtx = MatrixWithoutLong.transposed_matrix(array_for_ar_option)
-
-# def output_without_l_option(array)
-#   array.each do |file|
-#     file.each.with_index do |elemental, index|
-#       if file.size == index + 1
-#         print "#{elemental}\n"
-#       else
-#         print elemental
-#       end
-#     end
-#   end
-# end
-
-# output_without_l_option(mtx)
 
 # With L Option
 class ModeAndPermission
@@ -219,10 +203,6 @@ end
 
 DateClassObj.date_object(array_for_stat)
 
-# array1 = ModeAndPermission.my_file_permission(array_for_stat)
-# array2 = LinkAndOthers.link_etc(array_for_stat)
-# array3 = DateClassObj.date_object(array_for_stat)
-
 class MatrixWithLong
   def initialize(array1, array2)
     @array1 = array1
@@ -253,16 +233,6 @@ end
 new_object = MatrixWithLong.new(array_for_ar_option, array_for_stat)
 new_object.transposed
 
-# # matrix = []
-# # matrix << ModeAndPermission.my_file_permission(array_for_stat)
-# # matrix = matrix + LinkAndOthers.link_etc(array_for_stat)
-# # matrix << DateClassObj.date_object(array_for_stat)
-# # matrix << array_for_ar_option
-# # matrix << symbolic_link
-# # matrix
-
-# matrix_without_l = matrix.transpose
-
 def output_without_l_option(array)
   array.each do |file|
     file.each.with_index do |elemental, index|
@@ -286,9 +256,6 @@ def output_with_l_option(mtx)
     end
   end
 end
-
-# p matrix_without_l = matrix.transpose
-# matrix_with_l = new_object.transposed
 
 def display(matrix1, matrix2, option, block)
   if option
