@@ -3,21 +3,23 @@
 require 'etc'
 require 'optparse'
 
-# Dir.chdir('/usr/bin')
+Dir.chdir('/usr/bin')
 # Dir.chdir('/usr/sbin')
 # Dir.chdir("/Users/masataka_ikeda")
 # p Dir.pwd
 
 parameter = ARGV.getopts('lar')
 l_option = parameter['l']
-
 array_for_a_option = parameter['a'] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
 array_for_ar_option = parameter['r'] ? array_for_a_option.reverse : array_for_a_option
+array_for_stat = 
+array_for_ar_option.map do |string| 
+  File.lstat(string).ftype == 'link' ? File.lstat(string) : File.stat(string)
+end
+block_number = array_for_stat.map(&:blocks).sum
 
-array_for_stat = array_for_ar_option.map {|string| File.lstat(string).ftype == 'link' ? File.lstat(string) : File.stat(string) }
 
 
-# Describing the matrix without the long option
 class MatrixWithoutLong
   COLUMNS = 3
   def self.transposed_matrix(array)
@@ -51,52 +53,23 @@ class MatrixWithoutLong
   end
 end
 
-mtx_no_l = MatrixWithoutLong.transposed_matrix(array_for_ar_option)
-# p mtx_no_l
+mtx = MatrixWithoutLong.transposed_matrix(array_for_ar_option)
 
-  #   # condition = length_of_array.divmod(COLUMNS)[1]
-  #   # length = condition.zero? ? conditon[0] : condition[0] + 1
-  #   # adding_strings = condition.zero? ? 0 : length_of_row - length_of_array_without_l_option.divmod(length_of_row)[1]
+# def output_without_l_option(array)
+#   array.each do |file|
+#     file.each.with_index do |elemental, index|
+#       if file.size == index + 1
+#         print "#{elemental}\n"
+#       else
+#         print elemental
+#       end
+#     end
+#   end
+# end
 
+# output_without_l_option(mtx)
 
-
-  # # array_without_l_option = array_for_ar_option
-  # length_of_array = array.size
-
-  # # サイズを入れたアレイを定義する必要がある。
-  # max_size_in_array = array.map(&:size).max
-  # width_of_row = max_size_in_array > 25 ? max_size_in_array : 25
-  
-  
-  # length = condition[1].zero? ? conditon[0] : condition[0] + 1
-
-  # # condition_length[1].zero?
-  # length_of_row = condition_length[1].zero? ? condition_length[0] : condition_length[0] + 1
-  
-  # adding_strings = condition_length[1].zero? ? 0 : length_of_row - length_of_array_without_l_option.divmod(length_of_row)[1]
-
-  # divisible_array = array_without_l_option + Array.new(number_of_adding_strings, '')
-  # size_ajustment = divisible_array.map { |string| string.ljust(width_of_row_without_l_option) }
-  # matrix_for_transpose = size_ajustment.each_slice(length_of_row).to_a
-  # transposed_matrix_without_l_option = matrix_for_transpose.transpose
-
-def output_without_l_option(array)
-  array.each do |file|
-    file.each.with_index do |elemental, index|
-      if file.size == index + 1
-        print "#{elemental}\n"
-      else
-        print elemental
-      end
-    end
-  end
-end
-
-# p array_without_l_option
-
-output_without_l_option(mtx_no_l)
-
-# file permission
+# With L Option
 class ModeAndPermission
   def self.my_file_permission(array)
     my_file_permission = ModeAndPermission.new(array)
@@ -177,21 +150,33 @@ end
 
 ModeAndPermission.my_file_permission(array_for_stat)
 
-def links_uid_gid_size(array)
-  links = array.map { |stat| stat.nlink.to_s.rjust(4) }
-  width_of_uid = array.map { |stat| Etc.getpwuid(stat.uid).name.size }.max
-  uid =  array.map { |stat| Etc.getpwuid(stat.uid).name.rjust(width_of_uid) }
-  width_of_gid = array.map { |stat| Etc.getgrgid(stat.gid).name.size }.max
-  gid = array.map { |stat| Etc.getgrgid(stat.gid).name.rjust(width_of_gid) }
-  size = array.map {|stat| stat.size.to_s.rjust(9) }
-  mini_matrix = []
-  mini_matrix << links
-  mini_matrix << uid
-  mini_matrix << gid
-  mini_matrix << size    
+class LinkAndOthers
+  def self.link_etc(array)
+    object = LinkAndOthers.new(array)
+    object.link_uid_gid_size
+  end
+
+  def initialize(array)
+    @array = array
+  end
+
+  def link_uid_gid_size
+    link = @array.map { |stat| stat.nlink.to_s.rjust(4) }
+    width_of_uid = @array.map { |stat| Etc.getpwuid(stat.uid).name.size }.max
+    uid =  @array.map { |stat| Etc.getpwuid(stat.uid).name.rjust(width_of_uid) }
+    width_of_gid = @array.map { |stat| Etc.getgrgid(stat.gid).name.size }.max
+    gid = @array.map { |stat| Etc.getgrgid(stat.gid).name.rjust(width_of_gid) }
+    size = @array.map {|stat| stat.size.to_s.rjust(9) }
+
+    matrix = []
+    matrix << link
+    matrix << uid
+    matrix << gid
+    matrix << size    
+  end
 end
 
-# p links_uid_gid_size(array_for_stat).size
+LinkAndOthers.link_etc(array_for_stat)
 
 class DateClassObj
   def self.date_object(array)
@@ -232,31 +217,63 @@ class DateClassObj
   end
 end
 
-# DateClassObj.date_object(array_for_stat)
+DateClassObj.date_object(array_for_stat)
 
-symbolic_link =
-array_for_ar_option.map.with_index do |string, index|
-  array_for_stat[index].symlink? ? "-> #{File.readlink(string)}" : ''
+# array1 = ModeAndPermission.my_file_permission(array_for_stat)
+# array2 = LinkAndOthers.link_etc(array_for_stat)
+# array3 = DateClassObj.date_object(array_for_stat)
+
+class MatrixWithLong
+  def initialize(array1, array2)
+    @array1 = array1
+    @array2 = array2
+  end
+
+  def symbolic_link
+    @array1.map.with_index do |string, index|
+      @array2[index].symlink? ? "-> #{File.readlink(string)}" : ''
+    end
+  end
+  
+  def matrix_with_long
+    matrix = []
+    matrix << ModeAndPermission.my_file_permission(@array2)
+    matrix = matrix + LinkAndOthers.link_etc(@array2)
+    matrix << DateClassObj.date_object(@array2)
+    matrix << @array1
+    matrix << symbolic_link
+    matrix
+  end
+
+  def transposed
+    matrix_with_long.transpose
+  end
 end
 
-# p blocks_number = array_for_stat.map(&:blocks)
+new_object = MatrixWithLong.new(array_for_ar_option, array_for_stat)
+new_object.transposed
 
-ModeAndPermission.my_file_permission(array_for_stat).size
-links_uid_gid_size(array_for_stat).size
-DateClassObj.date_object(array_for_stat).size
-array_for_ar_option.size
-symbolic_link.size
+# # matrix = []
+# # matrix << ModeAndPermission.my_file_permission(array_for_stat)
+# # matrix = matrix + LinkAndOthers.link_etc(array_for_stat)
+# # matrix << DateClassObj.date_object(array_for_stat)
+# # matrix << array_for_ar_option
+# # matrix << symbolic_link
+# # matrix
 
+# matrix_without_l = matrix.transpose
 
-matrix = []
-matrix << ModeAndPermission.my_file_permission(array_for_stat)
-matrix = matrix + links_uid_gid_size(array_for_stat)
-matrix << DateClassObj.date_object(array_for_stat)
-matrix << array_for_ar_option
-matrix << symbolic_link
-matrix
-
-p transposed_matrix = matrix.transpose
+def output_without_l_option(array)
+  array.each do |file|
+    file.each.with_index do |elemental, index|
+      if file.size == index + 1
+        print "#{elemental}\n"
+      else
+        print elemental
+      end
+    end
+  end
+end
 
 def output_with_l_option(mtx)
   mtx.each do |file|
@@ -270,12 +287,16 @@ def output_with_l_option(mtx)
   end
 end
 
-output_with_l_option(transposed_matrix)
+# p matrix_without_l = matrix.transpose
+# matrix_with_l = new_object.transposed
 
+def display(matrix1, matrix2, option, block)
+  if option
+    puts "total #{block}"
+    output_with_l_option(matrix2)
+  else
+    output_without_l_option(matrix1)
+  end
+end
 
-# if condition == true
-#   puts "total #{array_with_l_option.blocks_number.sum}"
-#   output_with_l_option(matrix2)
-# else
-#   output_without_l_option(matrix1)
-# end
+display(mtx, new_object.transposed, l_option, block_number)
