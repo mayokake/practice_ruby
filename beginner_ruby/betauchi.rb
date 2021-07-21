@@ -25,12 +25,30 @@ class MatrixWithoutLong
     matrix.transposed_array
   end
 
+  def transposed_array
+    divisible_array.each_slice(row_length).to_a.transpose
+  end
+
+  # def output_without_l_option(array)
+  #   array.each do |file|
+  #     file.each.with_index do |string, index|
+  #       if file.size == index + 1
+  #         print "#{string}\n"
+  #       else
+  #         print string
+  #       end
+  #     end
+  #   end
+  # end
+
   def initialize(array)
     @array = array
     @length = @array.size
     @condition = @length.divmod(COLUMNS)
     @max_size_in_array = @array.map(&:size).max
   end
+
+  private
 
   def row_length
     @condition[1].zero? ? @condition[0] : @condition[0] + 1
@@ -44,10 +62,6 @@ class MatrixWithoutLong
     adding_string_num = row_length - @length.divmod(row_length)[1]
     divisible_array = @array + Array.new(adding_string_num, '')
     @size_ajustment = divisible_array.map { |string| string.ljust(row_width) }
-  end
-
-  def transposed_array
-    divisible_array.each_slice(row_length).to_a.transpose
   end
 end
 
