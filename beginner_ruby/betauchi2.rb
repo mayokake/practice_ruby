@@ -132,31 +132,63 @@ end
 ModeAndPermission.my_file_permission(array_for_stat)
 
 # LinkAndOthers
-class Others
-  def self.etc(array)
-    object = Others.new(array)
-    object.uid_gid
+# class Others
+#   def self.etc(array)
+#     object = Others.new(array)
+#     object.uid_gid
+#   end
+
+#   def initialize(array)
+#     @array = array
+#   end
+
+#   def width_of_uid
+#     @array.map { |stat| Etc.getpwuid(stat.uid).name.size }.max
+#   end
+
+#   def width_of_gid
+#     @array.map { |stat| Etc.getgrgid(stat.gid).name.size }.max
+#   end
+
+#   def uid_gid
+#     uid = @array.map { |stat| Etc.getpwuid(stat.uid).name.rjust(width_of_uid) }
+#     gid = @array.map { |stat| Etc.getgrgid(stat.gid).name.rjust(width_of_gid) }
+
+#     matrix = []
+#     matrix << uid
+#     matrix << gid
+#   end
+# end
+
+class Uid
+  def self.uid_information(array)
+    uid = Uid.new(array)
+    uid.uid_information
+  end
+
+  def uid_information
+    width_uid = @array.map { |stat| Etc.getpwuid(stat.uid).name.size }.max
+    @array.map { |stat| Etc.getpwuid(stat.uid).name.rjust(width_uid) }
   end
 
   def initialize(array)
     @array = array
   end
+end
 
-  def width_of_uid
-    @array.map { |stat| Etc.getpwuid(stat.uid).name.size }.max
+class Gid
+  def self.gid_information(array)
+    gid = Gid.new(array)
+    gid.gid_information
   end
 
-  def width_of_gid
-    @array.map { |stat| Etc.getgrgid(stat.gid).name.size }.max
+  def gid_information
+    width_gid = @array.map { |stat| Etc.getgrgid(stat.gid).name.size }.max
+    @array.map { |stat| Etc.getgrgid(stat.gid).name.rjust(width_gid) }
   end
 
-  def uid_gid
-    uid = @array.map { |stat| Etc.getpwuid(stat.uid).name.rjust(width_of_uid) }
-    gid = @array.map { |stat| Etc.getgrgid(stat.gid).name.rjust(width_of_gid) }
-
-    matrix = []
-    matrix << uid
-    matrix << gid
+  def initialize(array)
+    @array = array
   end
 end
 
@@ -225,7 +257,9 @@ class MatrixWithLong
     matrix = []
     matrix << ModeAndPermission.my_file_permission(@array2)
     matrix << link
-    matrix += Others.etc(@array2)
+    # matrix += Others.etc(@array2)
+    matrix << Uid.uid_information(@array2)
+    matrix << Gid.gid_information(@array2)
     matrix << size
     matrix << DateClassObj.date_object(@array2)
     matrix << @array1
