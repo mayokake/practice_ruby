@@ -6,7 +6,6 @@ require 'optparse'
 # Dir.chdir('/usr/bin')
 # Dir.chdir('/usr/sbin')
 # Dir.chdir("/Users/masataka_ikeda")
-# p Dir.pwd
 
 parameter = ARGV.getopts('lar')
 l_option = parameter['l']
@@ -17,7 +16,7 @@ array_for_stat = array_for_ar_option.map do |string|
 end
 block_number = array_for_stat.map(&:blocks).sum
 
-# Matrix without long option
+
 class ArrayWithoutLongOption
   COLUMNS = 3
 
@@ -48,9 +47,6 @@ class ArrayWithoutLongOption
   end
 end
 
-array_without_lopt = ArrayWithoutLongOption.transposed_array(array_for_ar_option)
-
-# With L Option
 class ModeAndPermission
   def self.my_file_permission(array)
     my_file_permission = ModeAndPermission.new(array)
@@ -129,37 +125,6 @@ class ModeAndPermission
   end
 end
 
-ModeAndPermission.my_file_permission(array_for_stat)
-
-# LinkAndOthers
-# class Others
-#   def self.etc(array)
-#     object = Others.new(array)
-#     object.uid_gid
-#   end
-
-#   def initialize(array)
-#     @array = array
-#   end
-
-#   def width_of_uid
-#     @array.map { |stat| Etc.getpwuid(stat.uid).name.size }.max
-#   end
-
-#   def width_of_gid
-#     @array.map { |stat| Etc.getgrgid(stat.gid).name.size }.max
-#   end
-
-#   def uid_gid
-#     uid = @array.map { |stat| Etc.getpwuid(stat.uid).name.rjust(width_of_uid) }
-#     gid = @array.map { |stat| Etc.getgrgid(stat.gid).name.rjust(width_of_gid) }
-
-#     matrix = []
-#     matrix << uid
-#     matrix << gid
-#   end
-# end
-
 class Uid
   def self.uid_information(array)
     uid = Uid.new(array)
@@ -192,18 +157,17 @@ class Gid
   end
 end
 
-# comment
-class DateClassObj
+class DateObject
   def self.date_object(array)
-    date_object = DateClassObj.new(array)
-    date_object.date_display
+    date_object = DateObject.new(array)
+    date_object.date_object
   end
 
   def initialize(array)
     @array = array
   end
 
-  def date_display
+  def date_object
     @array.map do |stat|
       if ((Time.now - stat.mtime) / 60 / 60 / 24).round > 365 / 2
         "#{month(stat)} #{day(stat)} #{year(stat)}"
@@ -232,12 +196,22 @@ class DateClassObj
   end
 end
 
-# comment
-class MatrixWithLong
+class ArrayWithLongOption
+  def self.transposed_array(array1, array2)
+    array_with_l_option = ArrayWithLongOption.new(array1, array2)
+    array_with_l_option.transposed_array
+  end
+
+  def transposed_array
+    matrix_with_long.transpose
+  end
+
   def initialize(array1, array2)
     @array1 = array1
     @array2 = array2
   end
+
+  private
 
   def link
     @array2.map { |stat| stat.nlink.to_s.rjust(4) }
@@ -257,43 +231,23 @@ class MatrixWithLong
     matrix = []
     matrix << ModeAndPermission.my_file_permission(@array2)
     matrix << link
-    # matrix += Others.etc(@array2)
     matrix << Uid.uid_information(@array2)
     matrix << Gid.gid_information(@array2)
     matrix << size
-    matrix << DateClassObj.date_object(@array2)
+    matrix << DateObject.date_object(@array2)
     matrix << @array1
     matrix << symbolic_link
     matrix
   end
-
-  def transposed
-    matrix_with_long.transpose
-  end
 end
 
-new_object = MatrixWithLong.new(array_for_ar_option, array_for_stat)
-new_object.transposed
-
-def output_without_l_option(array)
+def output_display(array)
   array.each do |file|
-    file.each.with_index do |elemental, index|
+    file.each.with_index do |element, index|
       if file.size == index + 1
-        print "#{elemental}\n"
+        print "#{element}\n"
       else
-        print elemental
-      end
-    end
-  end
-end
-
-def output_with_l_option(mtx)
-  mtx.each do |file|
-    file.each.with_index do |elemental, index|
-      if file.size == index + 1
-        print "#{elemental} \n"
-      else
-        print "#{elemental} "
+        print element
       end
     end
   end
@@ -302,10 +256,13 @@ end
 def display(matrix1, matrix2, option, block)
   if option
     puts "total #{block}"
-    output_with_l_option(matrix2)
+    output_display(matrix2)
   else
-    output_without_l_option(matrix1)
+    output_display(matrix1)
   end
 end
 
-display(array_without_lopt, new_object.transposed, l_option, block_number)
+array_without_l_option = ArrayWithoutLongOption.transposed_array(array_for_ar_option)
+array_with_l_option = ArrayWithLongOption.transposed_array(array_for_ar_option, array_for_stat)
+
+display(array_without_l_option, array_with_l_option, l_option, block_number)
