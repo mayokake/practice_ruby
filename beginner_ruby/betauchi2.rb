@@ -253,12 +253,12 @@ def output_display(array)
   end
 end
 
-def display(matrix1, matrix2, option, block)
+def display(array1, array2, option, block)
   if option
     puts "total #{block}"
-    output_display(matrix2)
+    output_display(array2)
   else
-    output_display(matrix1)
+    output_display(array1)
   end
 end
 
