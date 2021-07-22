@@ -18,54 +18,37 @@ end
 block_number = array_for_stat.map(&:blocks).sum
 
 # Matrix without long option
-class MatrixWithoutLong
+class ArrayWithoutLongOption
   COLUMNS = 3
-  def self.transposed_matrix(array)
-    matrix = MatrixWithoutLong.new(array)
-    matrix.transposed_array
+
+  def self.transposed_array(array)
+    array_without_l_option = ArrayWithoutLongOption.new(array)
+    array_without_l_option.transposed_array
   end
 
   def transposed_array
-    divisible_array.each_slice(row_length).to_a.transpose
+    divisible_array.each_slice(@row_size).to_a.transpose
   end
-
-  # def output_without_l_option(array)
-  #   array.each do |file|
-  #     file.each.with_index do |string, index|
-  #       if file.size == index + 1
-  #         print "#{string}\n"
-  #       else
-  #         print string
-  #       end
-  #     end
-  #   end
-  # end
 
   def initialize(array)
     @array = array
-    @length = @array.size
-    @condition = @length.divmod(COLUMNS)
-    @max_size_in_array = @array.map(&:size).max
+    @array_size = @array.size
+    @condition = @array_size.divmod(COLUMNS)
+    @element_max_size = @array.map(&:size).max
   end
 
   private
 
-  def row_length
-    @condition[1].zero? ? @condition[0] : @condition[0] + 1
-  end
-
-  def row_width
-    @max_size_in_array > 25 ? @max_size_in_array : 25
-  end
-
   def divisible_array
-    adding_string_num = row_length - @length.divmod(row_length)[1]
+    @row_size = @condition[1].zero? ? @condition[0] : @condition[0] + 1
+    adding_string_num = @row_size - @array_size.divmod(@row_size)[1]
     divisible_array = @array + Array.new(adding_string_num, '')
+    row_width = @element_max_size > 25 ? @element_max_size : 25
     @size_ajustment = divisible_array.map { |string| string.ljust(row_width) }
   end
 end
 
-mtx = MatrixWithoutLong.transposed_matrix(array_for_ar_option)
+array_without_lopt = ArrayWithoutLongOption.transposed_array(array_for_ar_option)
 
 # With L Option
 class ModeAndPermission
@@ -291,4 +274,4 @@ def display(matrix1, matrix2, option, block)
   end
 end
 
-display(mtx, new_object.transposed, l_option, block_number)
+display(array_without_lopt, new_object.transposed, l_option, block_number)
