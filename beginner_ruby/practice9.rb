@@ -2,7 +2,7 @@
 # 1
 module ChocolateChip
   def Chocolate_chip
-    @name += "チョコレートチップ" 
+    @name += 'チョコレートチップ'
   end
 end
 
@@ -11,7 +11,7 @@ ChocolateChip
 # 2
 module ChocolateChip
   def chocolate_chip
-    @name += "チョコレートチップ" 
+    @name += 'チョコレートチップ'
   end
 end
 
@@ -20,12 +20,11 @@ class Drink
   def initialize(name)
     @name = name
   end
-  def name
-    @name
-  end
+
+  attr_reader :name
 end
 
-drink = Drink.new("抹茶")
+drink = Drink.new('抹茶')
 drink.chocolate_chip
 puts drink.name
 
@@ -41,7 +40,7 @@ puts EspressoShot::Price
 # 4
 module WhippedCream
   def self.info
-    "whipped cream for topping "
+    'whipped cream for topping '
   end
 end
 

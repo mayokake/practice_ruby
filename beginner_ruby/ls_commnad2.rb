@@ -1,3 +1,4 @@
+# coding:ASCII-8BIT
 require 'etc'
 require 'optparse'
 
@@ -5,29 +6,26 @@ require 'optparse'
 #   @parameter = ARGV.getopts('lar')
 # end
 
-
 # class BasicAry
 #   def initialize(option)
 #     @parameter = option.getopts('lar')
 #   end
 # end
 
-
 @parameter = ARGV.getopts('lar')
-
+# p @parameter
 
 # p params
 
-# Dir.chdir("/usr/bin")
+Dir.chdir('/usr/bin')
 # Dir.chdir("/Users/masataka_ikeda")
 
 # p Dir.pwd
 
 # p test1212 = Dir.glob("su")
 
-
 def array_decide
-  @parameter['a'] ? Dir.glob("*", File::FNM_DOTMATCH) : Dir.glob("*")
+  @parameter['a'] ? Dir.glob('*', File::FNM_DOTMATCH) : Dir.glob('*')
 end
 
 def array_decided
@@ -40,63 +38,116 @@ def array_for_symlink
   end
 end
 
+# 最終確定した配列が必要
+## その配列の長さが必要
 
-@tate = 3
+# 縦3列の表示を完成させる
 
-# p num_array = array_for_symlink.size
-
-# p thr_dim1 = array_decide.map{|file| file.size}
-
-
-# p thr_dim2 = thr_dim1.max
-
-# p size_dim1 = thr_dim1.size
-p size_dim1 = array_decide.map{|file| file.size}.size
-p array_decide.size
-p amari_keisan = size_dim1.divmod(@tate)
-
-
-# p amari_tasu = Array.new(size_dim1.divmod(3)[1], 0)
-
-
-
-p thr_slice = 
-if size_dim1.divmod(@tate)[1] == 0
-  size_dim1.divmod(@tate)[0]
-else
-  size_dim1.divmod(@tate)[0] + 1
+# 表示のためのメソッド化
+def last_array
+  @tate = 3
+  size_dim1 = array_decide.size # 配列の長さ
+  @thr_dim1 = array_decide.map { |file| file.size }.max # 横幅の決定
+  # 3列化のための割る数の確定
+  thr_slice = size_dim1.divmod(@tate)[1] == 0 ? size_dim1.divmod(@tate)[0] : size_dim1.divmod(@tate)[0] + 1
+  # 追加する"""空の文字列の数の取得
+  diff_add =
+    if size_dim1.divmod(@tate)[1] != 0
+      thr_slice - size_dim1.divmod(thr_slice)[1]
+    else
+      0
+    end
+  # 最後の列への空文字追加
+  add_add = Array.new(diff_add, '')
+  # 最後の配列の決定
+  saigo_no_hairetsu = array_decided + add_add
+  # 3行配列の決定
+  thr_dim3 = []
+  saigo_no_hairetsu.each_slice(thr_slice) { |s| thr_dim3 << s }
+  thr_dim3
 end
 
-# p thr_slice
-size_dim1.divmod(thr_slice)
-diff_add = thr_slice - size_dim1.divmod(thr_slice)[1]
-add_add = Array.new(diff_add, "")
-saigo_no_hairetsu = array_decided + add_add
-
-thr_dim3 = []
-saigo_no_hairetsu.each_slice(thr_slice){|s| thr_dim3 << s }
-thr_dim3
-
-
-thr_dim4 = thr_dim3.transpose
-@fig = thr_dim4[0].size
-
-# puts ""
-# puts ""
-
-thr_dim4.each do |file|
-  file.each.with_index do |elemental, index|
-    if index == @fig - 1 #3
-      print elemental.ljust(30) + "\n"
-    else
-      print elemental.ljust(30)
+def normal_display(ary)
+  thr_dim4 = ary.transpose
+  fig = thr_dim4[0].size # 表示配列の折返しの決定
+  thr_dim4.each do |file|
+    file.each.with_index do |elemental, index|
+      if index == fig - 1
+        print elemental.ljust(@thr_dim1) + "\n"
+      else
+        print elemental.ljust(@thr_dim1)
+      end
     end
   end
 end
 
-# puts ""
+# @parameter['l'] ? puts "l-option" : normal_display(last_array)
+
+normal_display(last_array) if @parameter['l'] == false
+
 # puts ""
 
+# thr_dim4.each do |file|
+#   file.each.with_index do |elemental, index|
+#     if index == @fig - 1
+#       print elemental.ljust(@thr_dim1) + "\n"
+#     else
+#       print elemental.ljust(@thr_dim1)
+#     end
+#   end
+# end
+
+# @tate = 3
+# size_dim1 = array_decide.size # 配列の長さ
+# # 幅調整のため
+# @thr_dim1 = array_decide.map{|file| file.size}.max
+# # 配列の縦1列の長さ
+# thr_slice = size_dim1.divmod(@tate)[1] == 0 ? size_dim1.divmod(@tate)[0] : size_dim1.divmod(@tate)[0] + 1
+# # 最後の列の余りの数
+# diff_add =
+# if size_dim1.divmod(@tate)[1] != 0
+#   thr_slice - size_dim1.divmod(thr_slice)[1]
+# else
+#   0
+# end
+
+# # 最後の列への空文字追加
+# add_add = Array.new(diff_add, "")
+# saigo_no_hairetsu = array_decided + add_add
+
+# # 最終的な配列の決定
+# thr_dim3 = []
+# saigo_no_hairetsu.each_slice(thr_slice){|s| thr_dim3 << s }
+# thr_dim3
+
+# p num_array = array_for_symlink.size
+# p thr_dim1 = array_decide.map{|file| file.size}
+# p thr_dim2 = thr_dim1.max
+# p size_dim1 = thr_dim1.size
+# p size_dim1 = array_decide.map{|file| file.size}.size
+# p amari_keisan = size_dim1.divmod(@tate)
+# p amari_tasu = Array.new(size_dim1.divmod(3)[1], 0)
+# size_dim1.divmod(thr_slice)
+
+# # thr_dim4 = thr_dim3.transpose
+# p thr_dim4 = normal_display.transpose
+
+# @fig = thr_dim4[0].size # 表示配列の折返しの決定
+
+# # puts ""
+
+# thr_dim4.each do |file|
+#   file.each.with_index do |elemental, index|
+#     if index == @fig - 1
+#       print elemental.ljust(@thr_dim1) + "\n"
+#     else
+#       print elemental.ljust(@thr_dim1)
+#     end
+#   end
+# end
+
+# puts ""
+# puts ""
 
 # testtest1013 = array_for_symlink[-1]
 
@@ -112,12 +163,10 @@ end
 # p month = testtest1013.atime.month.to_s
 # p day = testtest1013.atime.day.to_s
 
-
-
 def file_type(file1)
   local_file = file1.ftype
   case local_file
-  when 'file' 
+  when 'file'
     '-'
   when 'directory'
     'd'
@@ -184,7 +233,7 @@ def file_mode_owner(file1)
   if id_mode == '4'
     id(local_mode)
   else
-   rwx(local_mode)
+    rwx(local_mode)
   end
 end
 
@@ -194,14 +243,14 @@ def file_mode_group(file1)
   if id_mode == '2'
     id(local_mode)
   else
-   rwx(local_mode)
+    rwx(local_mode)
   end
 end
 
 def file_mode_other(file1)
   local_mode = file1.mode.to_s(8).slice(-1)
   sticky_mode = file1.mode.to_s(8).slice(-4)
-  if local_mode ==  '4' && sticky_mode == '1'
+  if local_mode == '4' && sticky_mode == '1'
     'r-T'
   elsif local_mode == '5' && sticky_mode == '1'
     'r-t'
@@ -261,11 +310,11 @@ def date
     year = file.mtime.year.to_s
     month = file.mtime.month.to_s
     day = file.mtime.day.to_s
-    time_ob = file.mtime.strftime("%H:%M")
-    if ((Time.now - file.mtime)/60/60/24).round > 365/2
-      "#{month.rjust(2)} #{day.rjust(2)} #{year}" 
+    time_ob = file.mtime.strftime('%H:%M')
+    if ((Time.now - file.mtime) / 60 / 60 / 24).round > 365 / 2
+      "#{month.rjust(2)} #{day.rjust(2)} #{year}"
     else
-    "#{month.rjust(2)} #{day.rjust(2)} #{time_ob}"
+      "#{month.rjust(2)} #{day.rjust(2)} #{time_ob}"
     end
   end
 end
@@ -274,8 +323,8 @@ def symlink
   array_decided.map.with_index do |file, index|
     if array_for_symlink[index].symlink?
       "-> #{File.readlink(file)}"
-    else 
-      ""
+    else
+      ''
     end
   end
 end
@@ -286,13 +335,41 @@ def blocks_number
   end
 end
 
-puts ""
+def matrix
+  matrix = []
+  matrix << file_and_permission
+  matrix << number_of_links
+  matrix << uid
+  matrix << gid
+  matrix << size
+  matrix << date
+  matrix << array_decided
+  matrix << symlink
+end
 
-puts "total #{blocks_number.sum}"
+# p matrix
+# p matrix.transpose
 
+def another_display(mtx)
+  mtx.transpose.each do |file|
+    file.each.with_index do |elemental, index|
+      if file.size == index + 1
+        print elemental + ' ' + "\n"
+      else
+        print elemental + ' '
+      end
+    end
+  end
+end
+
+# another_display(matrix)
+
+if @parameter['l'] == true
+  puts "total #{blocks_number.sum}"
+  another_display(matrix)
+end
 
 # p array_for_symlink[0].blocks
-
 
 # input_file_name = array_decided[4]
 # p File.readlink(input_file_name)
@@ -302,14 +379,11 @@ puts "total #{blocks_number.sum}"
 
 # p array_for_symlink[0].symlink?
 
-
 # for_diff = array_for_symlink[0].mtime
 # p array_for_symlink[0].mtime.year
 # time_now = Time.now
 # p time_diff = time_now - for_diff
 # p (time_diff/60/60/24).round.to_s
-
-
 
 # p year = array_for_symlink[0].mtime.year.to_s
 # p month = array_for_symlink[0].mtime.month.to_s
@@ -318,38 +392,35 @@ puts "total #{blocks_number.sum}"
 
 # p "#{month.rjust(2)} #{day.rjust(2)} #{time_ob}"
 
-# p array_for_symlink[0].mtime.strftime "%m %d %Y %H:%M" 
+# p array_for_symlink[0].mtime.strftime "%m %d %Y %H:%M"
 # p array_for_symlink[0].size
 
+# matrix = []
+# matrix << file_and_permission
+# matrix << number_of_links
+# matrix << uid
+# matrix << gid
+# matrix << size
+# matrix << date
+# matrix << array_decided
+# matrix << symlink
 
-matrix = []
-matrix << file_and_permission
-matrix << number_of_links
-matrix << uid
-matrix << gid
-matrix << size
-matrix << date
-matrix << array_decided
-matrix << symlink
+# # p matrix
+# # p matrix.transpose
 
-# p matrix
-# p matrix.transpose
-
-
-matrix.transpose.each do |file|
-  file.each.with_index do |elemental, index|
-    if file.size == index + 1
-      print elemental + " " + "\n"
-    else
-      print elemental + " "
-    end
-  end
-end
+# matrix.transpose.each do |file|
+#   file.each.with_index do |elemental, index|
+#     if file.size == index + 1
+#       print elemental + " " + "\n"
+#     else
+#       print elemental + " "
+#     end
+#   end
+# end
 
 #### -l 指定がない場合の表示は、インシャルで3列とか、5列とかその数字をつかって後でいかようにも変更できるようにしよう！
 
 # ぼっちを最後のシンボリックリンクの名称で使えるかも
-
 
 # p file_type(array_for_symlink[0])
 # a = []
@@ -360,16 +431,12 @@ end
 #   p file_type(file)
 # end
 
-
-
-
 # # p array_map[-1].mode
 # # p array_map[-1].ftype
 
 # # def ary
 # #   parameter[:a] ? Dir.glob("*") : Dir.glob("*", File::FNM_DOTMATCH)
 # # end
-
 
 # # file_test = array_test[0]
 # # p file_test
@@ -397,9 +464,6 @@ end
 # p test_file.mode.to_s(8).slice(5)
 # p test_file.ftype
 
-
-
-
 # # p file_type(array_map[-1])
 
 # # def ftp
@@ -410,17 +474,12 @@ end
 
 # # p ftp
 
-
-
 # # def owner
 # # end
 
 # # def permission(file)
 
 # # end
-
-
-
 
 # # puts fs.mode  #=> 33188
 # # puts fs.mode.to_s(8).class #=> 100644
@@ -431,14 +490,12 @@ end
 # # p test1111[0]
 # # .mode.to_s(8).slice(-3.3)
 
-
 # # p fs.mode.to_s(8).slice(-3, 3)
 # # p fs.mode.to_s(8).slice(0, 2)
 # # p fs.mode.to_s(8).slice(2)
 # # p fs.mode.to_s(8).slice(3)
 # # p fs.mode.to_s(8).slice(4)
 # # p fs.mode.to_s(8).slice(5)
-
 
 # #   p Dir.glob("*", File::FNM_DOTMATCH)
 # # end

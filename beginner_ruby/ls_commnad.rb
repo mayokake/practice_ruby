@@ -1,8 +1,8 @@
 require 'etc'
 
 def array_decided
-  parameter = {a: true}
-  parameter[:a] ? Dir.glob("*") : Dir.glob("*", File::FNM_DOTMATCH)
+  parameter = { a: true }
+  parameter[:a] ? Dir.glob('*') : Dir.glob('*', File::FNM_DOTMATCH)
 end
 
 def array_for_symlink
@@ -14,7 +14,7 @@ end
 def file_type(file1)
   local_file = file1.ftype
   case local_file
-  when 'file' 
+  when 'file'
     '-'
   when 'directory'
     'd'
@@ -81,7 +81,7 @@ def file_mode_owner(file1)
   if id_mode == '4'
     id(local_mode)
   else
-   rwx(local_mode)
+    rwx(local_mode)
   end
 end
 
@@ -91,14 +91,14 @@ def file_mode_group(file1)
   if id_mode == '2'
     id(local_mode)
   else
-   rwx(local_mode)
+    rwx(local_mode)
   end
 end
 
 def file_mode_other(file1)
   local_mode = file1.mode.to_s(8).slice(-1)
   sticky_mode = file1.mode.to_s(8).slice(-4)
-  if local_mode ==  '4' && sticky_mode == '1'
+  if local_mode == '4' && sticky_mode == '1'
     'r-T'
   elsif local_mode == '5' && sticky_mode == '1'
     'r-t'
@@ -158,11 +158,11 @@ def date
     year = file.mtime.year.to_s
     month = file.mtime.month.to_s
     day = file.mtime.day.to_s
-    time_ob = file.mtime.strftime("%H:%M")
-    if ((Time.now - file.mtime)/60/60/24).round > 365/2
-      " 1 1 #{time_ob}" 
+    time_ob = file.mtime.strftime('%H:%M')
+    if ((Time.now - file.mtime) / 60 / 60 / 24).round > 365 / 2
+      " 1 1 #{time_ob}"
     else
-    "#{month.rjust(2)} #{day.rjust(2)} #{time_ob}"
+      "#{month.rjust(2)} #{day.rjust(2)} #{time_ob}"
     end
   end
 end
@@ -171,8 +171,8 @@ def symlink
   array_decided.map.with_index do |file, index|
     if array_for_symlink[index].symlink?
       "-> #{File.readlink(file)}"
-    else 
-      ""
+    else
+      ''
     end
   end
 end
@@ -186,7 +186,6 @@ end
 puts "total #{blocks_number.sum}"
 # p array_for_symlink[0].blocks
 
-
 # input_file_name = array_decided[4]
 # p File.readlink(input_file_name)
 
@@ -195,14 +194,11 @@ puts "total #{blocks_number.sum}"
 
 # p array_for_symlink[0].symlink?
 
-
 # for_diff = array_for_symlink[0].mtime
 # p array_for_symlink[0].mtime.year
 # time_now = Time.now
 # p time_diff = time_now - for_diff
 # p (time_diff/60/60/24).round.to_s
-
-
 
 # p year = array_for_symlink[0].mtime.year.to_s
 # p month = array_for_symlink[0].mtime.month.to_s
@@ -211,9 +207,8 @@ puts "total #{blocks_number.sum}"
 
 # p "#{month.rjust(2)} #{day.rjust(2)} #{time_ob}"
 
-# p array_for_symlink[0].mtime.strftime "%m %d %Y %H:%M" 
+# p array_for_symlink[0].mtime.strftime "%m %d %Y %H:%M"
 # p array_for_symlink[0].size
-
 
 matrix = []
 matrix << file_and_permission
@@ -228,13 +223,12 @@ matrix << symlink
 # p matrix
 # p matrix.transpose
 
-
 matrix.transpose.each do |file|
   file.each.with_index do |elemental, index|
     if file.size == index + 1
-      print elemental + " " + "\n"
+      print elemental + ' ' + "\n"
     else
-      print elemental + " "
+      print elemental + ' '
     end
   end
 end
@@ -242,7 +236,6 @@ end
 #### -l 指定がない場合の表示は、インシャルで3列とか、5列とかその数字をつかって後でいかようにも変更できるようにしよう！
 
 # ぼっちを最後のシンボリックリンクの名称で使えるかも
-
 
 # p file_type(array_for_symlink[0])
 # a = []
@@ -253,16 +246,12 @@ end
 #   p file_type(file)
 # end
 
-
-
-
 # # p array_map[-1].mode
 # # p array_map[-1].ftype
 
 # # def ary
 # #   parameter[:a] ? Dir.glob("*") : Dir.glob("*", File::FNM_DOTMATCH)
 # # end
-
 
 # # file_test = array_test[0]
 # # p file_test
@@ -290,9 +279,6 @@ end
 # p test_file.mode.to_s(8).slice(5)
 # p test_file.ftype
 
-
-
-
 # # p file_type(array_map[-1])
 
 # # def ftp
@@ -303,17 +289,12 @@ end
 
 # # p ftp
 
-
-
 # # def owner
 # # end
 
 # # def permission(file)
 
 # # end
-
-
-
 
 # # puts fs.mode  #=> 33188
 # # puts fs.mode.to_s(8).class #=> 100644
@@ -324,7 +305,6 @@ end
 # # p test1111[0]
 # # .mode.to_s(8).slice(-3.3)
 
-
 # # p fs.mode.to_s(8).slice(-3, 3)
 # # p fs.mode.to_s(8).slice(0, 2)
 # # p fs.mode.to_s(8).slice(2)
@@ -332,10 +312,9 @@ end
 # # p fs.mode.to_s(8).slice(4)
 # # p fs.mode.to_s(8).slice(5)
 
-
-Dir.chdir("/usr/bin")
+Dir.chdir('/usr/bin')
 p Dir.pwd
-p test1212 = Dir.glob("su")
+p test1212 = Dir.glob('su')
 # #   p Dir.glob("*", File::FNM_DOTMATCH)
 # # end
 # # p Dir.pwd
