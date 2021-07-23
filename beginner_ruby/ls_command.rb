@@ -121,7 +121,7 @@ class ModeAndPermission
     arr_atribute << file_mode_owner(file)
     arr_atribute << file_mode_group(file)
     arr_atribute << file_mode_other(file)
-    arr_atribute.join.ljust(11)
+    arr_atribute.join #.ljust(11)
   end
 end
 
@@ -245,9 +245,9 @@ def output_display(array)
   array.each do |file|
     file.each.with_index do |element, index|
       if file.size == index + 1
-        print "#{element}\n"
+        print "#{element} \n"
       else
-        print element
+        print "#{element} "
       end
     end
   end
