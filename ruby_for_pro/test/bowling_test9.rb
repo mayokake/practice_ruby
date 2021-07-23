@@ -49,3 +49,4 @@ end
 
 my_score = Bowling.new(ARGV)
 p my_score.points_of_strikes + my_score.points_of_spares + my_score.scores.sum
+# comment
