@@ -8,13 +8,31 @@ p parameter
 
 # array_for_a_option = Dir.glob('*', File::FNM_DOTMATCH)
 array_for_b_option = Dir.glob('*')
-p array_for_a_option
-p array_for_b_option
+# array_get = array_for_b_option.map do |string|
+#   string.
+# end
 
-p test1 = ARGV.select { |string| array_for_a_option.include?(string)}
-p test1.size
-p test2 = ARGV.map {|string| array_for_a_option.include?(string) }
+# p File.stat(array_for_b_option[1]).ftype
 
+array_get = 
+array_for_b_option.filter_map do |string| 
+  string if File.stat(string).ftype == 'file' 
+end
+
+p array_get
+# p array_get.select {|string| File.stat(string).ftype == 'file'}
+
+
+
+##### empty?
+
+
+# p array_for_a_option
+# p array_for_b_option
+
+p test1 = ARGV.select { |string| array_get.include?(string)}
+# p test1.size
+# p test2 = ARGV.map {|string| array_for_b_option.include?(string) }
 
 
 
