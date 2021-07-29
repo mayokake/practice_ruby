@@ -83,8 +83,6 @@ class WordCount
     words = words(string).to_s.rjust(8)
     bytes = bytes(string).to_s.rjust(8)
     print "#{lines}#{words}#{bytes}"
-    # print words.to_s.rjust(8)
-    # print bytes.to_s.rjust(8)
   end
 
   def total
@@ -100,4 +98,52 @@ class WordCount
   end
 end
 
-l_option ? WordCount.lines_only(array_from_argument) : WordCount.all(array_from_argument)
+# word count from input
+class WordCountFromInput
+  def self.all_from_input(input)
+    word_count_from_input = WordCountFromInput.new(input)
+    word_count_from_input.all_from_input
+  end
+
+  def self.line(input)
+    word_count_from_input2 = WordCountFromInput.new(input)
+    puts word_count_from_input2.line.to_s.rjust(8)
+  end
+
+  def all_from_input
+    lines = line.to_s.rjust(8)
+    words = word.to_s.rjust(8)
+    bytes = byte.to_s.rjust(8)
+    puts "#{lines}#{words}#{bytes}"
+  end
+
+  def initialize(input)
+    @input = input
+  end
+
+  def line
+    @input.count("\n")
+  end
+
+  private
+
+  def word
+    @input.split(/\s/).reject(&:empty?).size
+  end
+
+  def byte
+    @input.bytesize
+  end
+end
+
+if array_from_argument.empty? && l_option == false
+  input = $stdin.read
+  WordCountFromInput.all_from_input(input)
+elsif array_from_argument.empty? && l_option == true
+  input = $stdin.read
+  WordCountFromInput.line(input)
+elsif array_from_argument.empty? == false && l_option == true
+  WordCount.lines_only(array_from_argument)
+else
+  WordCount.all(array_from_argument)
+end
