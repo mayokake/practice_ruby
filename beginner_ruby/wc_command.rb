@@ -98,9 +98,8 @@ class WordCount
   end
 
   def total_lines_only
-    lines = lines_number_sum
-    print lines.to_s.rjust(8)
-    puts ' total'
+    lines = lines_number_sum.to_s.rjust(8)
+    puts "#{lines} total"
   end
 end
 
