@@ -2,61 +2,110 @@
 
 require 'optparse'
 
-# p ARGV
 parameter = ARGV.getopts('l')
+array_files_only = Dir.glob('*').filter_map { |string| string if File.stat(string).ftype == 'file' }
+array_from_argument = ARGV.select { |string| array_files_only.include?(string)}
+array_file_read = array_from_argument.map { |string| File.read(string)}
 
-array_get = Dir.glob('*').filter_map { |string| string if File.stat(string).ftype == 'file' }
-condition_array = ARGV.select { |string| array_get.include?(string)}
-p condition_array
+# p array_file_read
 
-string_array = condition_array.map { |string| File.read(string)}
+class WordCount
+  def initialize(array)
+    @array = array
+  end
 
-def load_name(str)
+  
+
+  def file_name(str)
+    str
+  end
+
+  def lines_number(str)
+    str.count("\n")
+  end
+
+  def lines_number_sum(array)
+    numbers = array.map{|string| lines_number(string)}
+    numbers.sum
+  end
+
+  def words(str)
+    str.split(/\s/).reject(&:empty?).size
+  end
+  
+  def words_sum(array)
+    num = array.map{|string| words(string)}
+    num.sum
+  end
+
+  def bytes(str)
+    str.bytesize
+  end
+  
+  def bytes_sum(array)
+    num = array.map{|string| bytes(string)}
+    num.sum
+  end
+
+  def merge_data(input)
+    lines = lines_number(input)
+    words = words(input)
+    bytes = bytes(input)
+    print lines.to_s.rjust(8)
+    print words.to_s.rjust(8)
+    print bytes.to_s.rjust(8)
+    # puts
+  end
+
+
+
+
+
+  
+
+
+
+end
+
+
+def file_name(str)
   str
 end
 
-# p load_name(condition_array[0])
-
 # 行数を取得
-def load_lines(str)
+def lines_number(str)
   str.count("\n")
 end
 
-def load_lines_sum(array)
-  num = array.map{|string| load_lines(string)}
+def lines_number_sum(array)
+  num = array.map{|string| lines_number(string)}
   num.sum
 end
 
-# p load_lines_sum(string_array)
-
 # 単語数を取得
-def load_words(str)
+def words(str)
   str.split(/\s/).reject(&:empty?).size
 end
 
-def load_words_sum(array)
-  num = array.map{|string| load_words(string)}
+def words_sum(array)
+  num = array.map{|string| words(string)}
   num.sum
 end
 
-# p load_words_sum(string_array)
-
 # バイト数を取得
-def load_bytes(str)
+def bytes(str)
   str.bytesize
 end
 
-def load_bytes_sum(array)
-  num = array.map{|string| load_bytes(string)}
+def bytes_sum(array)
+  num = array.map{|string| bytes(string)}
   num.sum
 end
 
-# p load_bytes_sum(string_array)
-
 def total(input)
-  lines = load_lines_sum(input) # 行数
-  words = load_words_sum(input) # 単語数
-  bytes = load_bytes_sum(input) # バイト数
+  lines = lines_number_sum(input) # 行数
+  words = words_sum(input) # 単語数
+  bytes = bytes_sum(input) # バイト数
 
   print lines.to_s.rjust(8)
   print words.to_s.rjust(8)
@@ -64,11 +113,10 @@ def total(input)
   puts ' total'
 end
 
-
-def all_data(input)
-  lines = load_lines(input) # 行数
-  words = load_words(input) # 単語数
-  bytes = load_bytes(input) # バイト数
+def merge_data(input)
+  lines = lines_number(input) # 行数
+  words = words(input) # 単語数
+  bytes = bytes(input) # バイト数
 
   print lines.to_s.rjust(8)
   print words.to_s.rjust(8)
@@ -77,23 +125,22 @@ def all_data(input)
 end
 
 def only_lines(input)
-  lines = load_lines(input) # 行数
+  lines = lines_number(input) # 行数
   print lines.to_s.rjust(8)
 end
 
 def total_lines_only(input)
-  lines = load_lines_sum(input) # 行数
+  lines = lines_number_sum(input) # 行数
   print lines.to_s.rjust(8)
   puts ' total'
 end
 
 
-
 def all(array)
   array.map do |string|
     one_string = File.read(string)
-    all_data(one_string)
-    puts " #{load_name(string)}"
+    merge_data(one_string)
+    puts " #{file_name(string)}"
   end
 end
 
@@ -101,23 +148,15 @@ def lines_only(array)
   array.map do |string|
     one_string = File.read(string)
     only_lines(one_string)
-    puts " #{load_name(string)}"
+    puts " #{file_name(string)}"
   end
 end
 
-lines_only(condition_array)
-total_lines_only(string_array)
+lines_only(array_from_argument)
+total_lines_only(array_file_read)
 
 puts ""
 puts ""
 
-all(condition_array)
-total(string_array)
-
-
-
-
-# # ファイル名を取得する、そのファイルがディレクトリに含まれるかどうか確認する必要がある
-# # ディレクトリは削除する
-# # その他のシンボリックリンクなどはどうするんだろうか？
-# # 標準入力とは何だろうか？
+all(array_from_argument)
+total(array_file_read)
