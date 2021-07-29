@@ -79,12 +79,12 @@ class WordCount
   end
 
   def merge_data(string)
-    lines = lines_number(string)
-    words = words(string)
-    bytes = bytes(string)
-    print lines.to_s.rjust(8)
-    print words.to_s.rjust(8)
-    print bytes.to_s.rjust(8)
+    lines = lines_number(string).to_s.rjust(8)
+    words = words(string).to_s.rjust(8)
+    bytes = bytes(string).to_s.rjust(8)
+    print "#{lines}#{words}#{bytes}"
+    # print words.to_s.rjust(8)
+    # print bytes.to_s.rjust(8)
   end
 
   def total
