@@ -88,13 +88,10 @@ class WordCount
   end
 
   def total
-    lines = lines_number_sum
-    words = words_sum
-    bytes = bytes_sum
-    print lines.to_s.rjust(8)
-    print words.to_s.rjust(8)
-    print bytes.to_s.rjust(8)
-    puts ' total'
+    lines = lines_number_sum.to_s.rjust(8)
+    words = words_sum.to_s.rjust(8)
+    bytes = bytes_sum.to_s.rjust(8)
+    puts "#{lines}#{words}#{bytes} total"
   end
 
   def total_lines_only
