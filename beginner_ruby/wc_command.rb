@@ -104,4 +104,4 @@ class WordCount
   end
 end
 
-l_option ? WordCountCommand.lines_only(array_from_argument) : WordCountCommand.all(array_from_argument)
+l_option ? WordCount.lines_only(array_from_argument) : WordCount.all(array_from_argument)
