@@ -5,18 +5,13 @@ require 'optparse'
 parameter = ARGV.getopts('l')
 l_option = parameter['l']
 array_files_only = Dir.glob('*').filter_map { |string| string if File.stat(string).ftype == 'file' }
-array_from_argument = ARGV.select { |string| array_files_only.include?(string)}
-array_file_read = array_from_argument.map { |string| File.read(string)}
+array_from_argument = ARGV.select { |string| array_files_only.include?(string) }
 
+# word count command assignment
 class WordCount
   def self.all(array)
     word_count = WordCount.new(array)
     word_count.all
-  end
-
-  def self.total_lines_only(array)
-    word_count2 = WordCount.new(array)
-    word_count2.total_lines_only
   end
 
   def self.lines_only(array)
@@ -26,7 +21,7 @@ class WordCount
 
   def initialize(array)
     @array = array
-    @array_convert = @array.map { |string| File.read(string)}
+    @array_convert = @array.map { |string| File.read(string) }
   end
 
   def all
@@ -44,7 +39,7 @@ class WordCount
     end
     total_lines_only
   end
-  
+
   private
 
   def file_name(string)
@@ -61,25 +56,25 @@ class WordCount
   end
 
   def only_lines(input)
-    lines = lines_number(input) # 行数
+    lines = lines_number(input)
     print lines.to_s.rjust(8)
   end
 
   def words(string)
     string.split(/\s/).reject(&:empty?).size
   end
-  
+
   def words_sum
-    number = @array_convert.map {|string| words(string)}
+    number = @array_convert.map { |string| words(string) }
     number.sum
   end
 
   def bytes(string)
     string.bytesize
   end
-  
+
   def bytes_sum
-    num = @array_convert.map{|string| bytes(string)}
+    num = @array_convert.map { |string| bytes(string) }
     num.sum
   end
 
@@ -95,7 +90,7 @@ class WordCount
   def total
     lines = lines_number_sum
     words = words_sum
-    bytes = bytes_sum  
+    bytes = bytes_sum
     print lines.to_s.rjust(8)
     print words.to_s.rjust(8)
     print bytes.to_s.rjust(8)
@@ -109,4 +104,4 @@ class WordCount
   end
 end
 
-l_option ? WordCount.lines_only(array_from_argument) : WordCount.all(array_from_argument)
+l_option ? WordCountCommand.lines_only(array_from_argument) : WordCountCommand.all(array_from_argument)
