@@ -39,7 +39,7 @@ class WordCount
   def all_information
     @array2.map.with_index do |string, i|
       merge_data(string)
-      puts " #{file_name(@array[i])}"
+      puts " #{@array[i]}"
     end
     total
   end
@@ -47,7 +47,7 @@ class WordCount
   def lines_only
     @array2.map.with_index do |string, i|
       only_lines(string)
-      puts " #{file_name(@array[i])}"
+      puts " #{@array[i]}"
     end
     total_lines_only
   end
@@ -61,12 +61,23 @@ class WordCount
     print "#{line_num}#{word_num}#{byte_num}"
   end
 
-  def file_name(string)
-    string
-  end
-
   def lines_number(string)
     string.count("\n")
+  end
+
+  def words(string)
+    string.split(/\s/).reject(&:empty?).size
+  end
+
+  def bytes(string)
+    string.bytesize
+  end
+
+  def total
+    lines = lines_number_sum.to_s.rjust(8)
+    words = words_sum.to_s.rjust(8)
+    bytes = bytes_sum.to_s.rjust(8)
+    puts "#{lines}#{words}#{bytes} total"
   end
 
   def lines_number_sum
@@ -74,41 +85,19 @@ class WordCount
     numbers.sum
   end
 
-  def only_lines(input)
-    lines = lines_number(input)
-    print lines.to_s.rjust(8)
-  end
-
-  def words(string)
-    string.split(/\s/).reject(&:empty?).size
-  end
-
   def words_sum
     number = @array2.map { |string| words(string) }
     number.sum
   end
-
-  def bytes(string)
-    string.bytesize
-  end
-
+    
   def bytes_sum
     num = @array2.map { |string| bytes(string) }
     num.sum
   end
 
-  # def merge_data(string)
-  #   lines = lines_number(string).to_s.rjust(8)
-  #   words = words(string).to_s.rjust(8)
-  #   bytes = bytes(string).to_s.rjust(8)
-  #   print "#{lines}#{words}#{bytes}"
-  # end
-
-  def total
-    lines = lines_number_sum.to_s.rjust(8)
-    words = words_sum.to_s.rjust(8)
-    bytes = bytes_sum.to_s.rjust(8)
-    puts "#{lines}#{words}#{bytes} total"
+  def only_lines(input)
+    lines = lines_number(input)
+    print lines.to_s.rjust(8)
   end
 
   def total_lines_only
