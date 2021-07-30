@@ -21,23 +21,23 @@ strings_array = files_in_the_argument.map { |string| File.read(string) }
 
 # word count command assignment
 class WordCount
-  def self.all_information(array)
-    word_count = WordCount.new(array)
+  def self.all_information(array, array2)
+    word_count = WordCount.new(array, array2)
     word_count.all_information
   end
 
-  def self.lines_only(array)
-    word_count3 = WordCount.new(array)
+  def self.lines_only(array, array2)
+    word_count3 = WordCount.new(array, array2)
     word_count3.lines_only
   end
 
-  def initialize(array)
+  def initialize(array, array2)
     @array = array
-    @array_convert = @array.map { |string| File.read(string) }
+    @array2 = array2
   end
 
   def all_information
-    @array_convert.map.with_index do |string, i|
+    @array2.map.with_index do |string, i|
       merge_data(string)
       puts " #{file_name(@array[i])}"
     end
@@ -45,7 +45,7 @@ class WordCount
   end
 
   def lines_only
-    @array_convert.map.with_index do |string, i|
+    @array2.map.with_index do |string, i|
       only_lines(string)
       puts " #{file_name(@array[i])}"
     end
@@ -53,6 +53,13 @@ class WordCount
   end
 
   private
+
+  def merge_data(string)
+    line_num = string.count("\n").to_s.rjust(8)
+    word_num = string.split(/\s/).reject(&:empty?).size.to_s.rjust(8)
+    byte_num = string.bytesize.to_s.rjust(8)
+    print "#{line_num}#{word_num}#{byte_num}"
+  end
 
   def file_name(string)
     string
@@ -63,7 +70,7 @@ class WordCount
   end
 
   def lines_number_sum
-    numbers = @array_convert.map { |string| lines_number(string) }
+    numbers = @array2.map { |string| lines_number(string) }
     numbers.sum
   end
 
@@ -77,7 +84,7 @@ class WordCount
   end
 
   def words_sum
-    number = @array_convert.map { |string| words(string) }
+    number = @array2.map { |string| words(string) }
     number.sum
   end
 
@@ -86,16 +93,16 @@ class WordCount
   end
 
   def bytes_sum
-    num = @array_convert.map { |string| bytes(string) }
+    num = @array2.map { |string| bytes(string) }
     num.sum
   end
 
-  def merge_data(string)
-    lines = lines_number(string).to_s.rjust(8)
-    words = words(string).to_s.rjust(8)
-    bytes = bytes(string).to_s.rjust(8)
-    print "#{lines}#{words}#{bytes}"
-  end
+  # def merge_data(string)
+  #   lines = lines_number(string).to_s.rjust(8)
+  #   words = words(string).to_s.rjust(8)
+  #   bytes = bytes(string).to_s.rjust(8)
+  #   print "#{lines}#{words}#{bytes}"
+  # end
 
   def total
     lines = lines_number_sum.to_s.rjust(8)
@@ -155,7 +162,7 @@ elsif files_in_the_argument.empty? && l_option == true
   input = $stdin.read
   WordCountFromInput.line(input)
 elsif files_in_the_argument.empty? == false && l_option == true
-  WordCount.lines_only(files_in_the_argument)
+  WordCount.lines_only(files_in_the_argument, strings_array)
 else
-  WordCount.all_information(files_in_the_argument)
+  WordCount.all_information(files_in_the_argument, strings_array)
 end
