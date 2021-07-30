@@ -8,18 +8,22 @@ parameter = ARGV.getopts('l')
 # 変数定義
 l_option = parameter['l']
 
-# 名称変更必須 
-array_files_only = Dir.glob('*').filter_map { |string| string if File.stat(string).ftype == 'file' }
+# ディレクトリにあるファイルのみを対象とする
+files_only = Dir.glob('*').filter_map { |string| string if File.stat(string).ftype == 'file' }
 
-# 名称変更必須
-array_from_argument = ARGV.select { |string| array_files_only.include?(string) }
+# 引数から指定されたファイル、かつディレクトリにある
+files_in_the_argument = ARGV.select { |string| files_only.include?(string) }
+
+# 第2変数とする
+strings_array = files_in_the_argument.map { |string| File.read(string) }
+
 
 
 # word count command assignment
 class WordCount
-  def self.all(array)
+  def self.all_information(array)
     word_count = WordCount.new(array)
-    word_count.all
+    word_count.all_information
   end
 
   def self.lines_only(array)
@@ -32,7 +36,7 @@ class WordCount
     @array_convert = @array.map { |string| File.read(string) }
   end
 
-  def all
+  def all_information
     @array_convert.map.with_index do |string, i|
       merge_data(string)
       puts " #{file_name(@array[i])}"
@@ -144,14 +148,14 @@ class WordCountFromInput
   end
 end
 
-if array_from_argument.empty? && l_option == false
+if files_in_the_argument.empty? && l_option == false
   input = $stdin.read
   WordCountFromInput.all_from_input(input)
-elsif array_from_argument.empty? && l_option == true
+elsif files_in_the_argument.empty? && l_option == true
   input = $stdin.read
   WordCountFromInput.line(input)
-elsif array_from_argument.empty? == false && l_option == true
-  WordCount.lines_only(array_from_argument)
+elsif files_in_the_argument.empty? == false && l_option == true
+  WordCount.lines_only(files_in_the_argument)
 else
-  WordCount.all(array_from_argument)
+  WordCount.all_information(files_in_the_argument)
 end
