@@ -35,7 +35,7 @@ array_from_argument = ARGV.select { |string| array_files_only.include?(string) }
 #   end
 # end
 
-# input = $stdin.read
+input = $stdin.read
 
 def tantai(input)
   lines = input.count("\n")
@@ -45,6 +45,38 @@ def tantai(input)
 end
 
 # tantai(input)
+
+
+def lines(str)
+  str.count("\n")
+end
+
+# 単語数を取得
+def load_words(str)
+  str.split(/\s/).reject(&:empty?).size
+end
+
+# バイト数を取得
+def load_bytes(str)
+  str.bytesize
+end
+
+def all_data(input)
+  lines = load_lines(input) # 行数
+  words = load_words(input) # 単語数
+  bytes = load_bytes(input) # バイト数
+  
+  print lines.to_s.rjust(8)
+  print words.to_s.rjust(8)
+  print bytes.to_s.rjust(8)
+  puts
+end
+
+all_data(input)
+
+
+
+
 
 def arrange(array)
   array.map do |string|
