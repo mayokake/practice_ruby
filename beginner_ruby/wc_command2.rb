@@ -81,17 +81,17 @@ class WordCount
   end
 
   def lines_number_sum
-    numbers = @array2.map { |string| lines_number(string) }
+    numbers = @array2.map { |string| string.count("\n") }
     numbers.sum
   end
 
   def words_sum
-    number = @array2.map { |string| words(string) }
+    number = @array2.map { |string| string.split(/\s/).reject(&:empty?).size }
     number.sum
   end
     
   def bytes_sum
-    num = @array2.map { |string| bytes(string) }
+    num = @array2.map { |string| string.bytesize }
     num.sum
   end
 

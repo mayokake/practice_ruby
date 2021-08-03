@@ -2,46 +2,38 @@
 
 require 'optparse'
 
-# Lオプションの取得
 parameter = ARGV.getopts('l')
-
-# 変数定義
 l_option = parameter['l']
-
-# 名称変更必須 
-array_files_only = Dir.glob('*').filter_map { |string| string if File.stat(string).ftype == 'file' }
-
-# 名称変更必須
-array_from_argument = ARGV.select { |string| array_files_only.include?(string) }
-
+files = Dir.glob('*').filter_map { |string| string if File.stat(string).ftype == 'file' }
+files_from_argument = ARGV.select { |string| files.include?(string) }
 
 # word count command assignment
 class WordCount
-  def self.all(array)
+  def self.full_information(array)
     word_count = WordCount.new(array)
-    word_count.all
+    word_count.full_information
   end
 
   def self.lines_only(array)
-    word_count3 = WordCount.new(array)
-    word_count3.lines_only
+    line_in_word_count = WordCount.new(array)
+    line_in_word_count.lines_only
   end
 
   def initialize(array)
     @array = array
-    @array_convert = @array.map { |string| File.read(string) }
+    @array_file_read = @array.map { |string| File.read(string) }
   end
 
-  def all
-    @array_convert.map.with_index do |string, i|
-      merge_data(string)
+  def full_information
+    @array_file_read.map.with_index do |string, i|
+      merge_information(string)
       puts " #{file_name(@array[i])}"
     end
     total
   end
 
   def lines_only
-    @array_convert.map.with_index do |string, i|
+    @array_file_read.map.with_index do |string, i|
       only_lines(string)
       puts " #{file_name(@array[i])}"
     end
@@ -50,43 +42,7 @@ class WordCount
 
   private
 
-  def file_name(string)
-    string
-  end
-
-  def lines_number(string)
-    string.count("\n")
-  end
-
-  def lines_number_sum
-    numbers = @array_convert.map { |string| lines_number(string) }
-    numbers.sum
-  end
-
-  def only_lines(input)
-    lines = lines_number(input)
-    print lines.to_s.rjust(8)
-  end
-
-  def words(string)
-    string.split(/\s/).reject(&:empty?).size
-  end
-
-  def words_sum
-    number = @array_convert.map { |string| words(string) }
-    number.sum
-  end
-
-  def bytes(string)
-    string.bytesize
-  end
-
-  def bytes_sum
-    num = @array_convert.map { |string| bytes(string) }
-    num.sum
-  end
-
-  def merge_data(string)
+  def merge_information(string)
     lines = lines_number(string).to_s.rjust(8)
     words = words(string).to_s.rjust(8)
     bytes = bytes(string).to_s.rjust(8)
@@ -104,13 +60,49 @@ class WordCount
     lines = lines_number_sum.to_s.rjust(8)
     puts "#{lines} total"
   end
+
+  def file_name(string)
+    string
+  end
+
+  def lines_number(string)
+    string.count("\n")
+  end
+
+  def words(string)
+    string.split(/\s/).reject(&:empty?).size
+  end
+
+  def bytes(string)
+    string.bytesize
+  end
+
+  def lines_number_sum
+    numbers = @array_file_read.map { |string| lines_number(string) }
+    numbers.sum
+  end
+
+  def words_sum
+    number = @array_file_read.map { |string| words(string) }
+    number.sum
+  end
+
+  def bytes_sum
+    num = @array_file_read.map { |string| bytes(string) }
+    num.sum
+  end
+
+  def only_lines(input)
+    lines = lines_number(input)
+    print lines.to_s.rjust(8)
+  end
 end
 
 # word count from input
 class WordCountFromInput
-  def self.all_from_input(input)
+  def self.full_from_input(input)
     word_count_from_input = WordCountFromInput.new(input)
-    word_count_from_input.all_from_input
+    word_count_from_input.full_from_input
   end
 
   def self.line(input)
@@ -118,7 +110,7 @@ class WordCountFromInput
     puts word_count_from_input2.line.to_s.rjust(8)
   end
 
-  def all_from_input
+  def full_from_input
     lines = line.to_s.rjust(8)
     words = word.to_s.rjust(8)
     bytes = byte.to_s.rjust(8)
@@ -144,14 +136,14 @@ class WordCountFromInput
   end
 end
 
-if array_from_argument.empty? && l_option == false
+if files_from_argument.empty? && l_option == false
   input = $stdin.read
-  WordCountFromInput.all_from_input(input)
-elsif array_from_argument.empty? && l_option == true
+  WordCountFromInput.full_from_input(input)
+elsif files_from_argument.empty? && l_option == true
   input = $stdin.read
   WordCountFromInput.line(input)
-elsif array_from_argument.empty? == false && l_option == true
-  WordCount.lines_only(array_from_argument)
+elsif files_from_argument.empty? == false && l_option == false
+  WordCount.full_information(files_from_argument)
 else
-  WordCount.all(array_from_argument)
+  WordCount.lines_only(files_from_argument)
 end
